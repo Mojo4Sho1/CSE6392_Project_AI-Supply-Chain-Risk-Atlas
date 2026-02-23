@@ -5,50 +5,57 @@
 
 ## Current focus
 
-Establish the agent-first operating workflow for this repository: read order, handoff contract, and spec-routing index.
+Translate planning decisions into authoritative project specs and shared environment setup.
 
 ## Completed in current focus
 
-- Created root-level `AGENTS.md` with:
-  - mandatory read order (`AGENTS -> CURRENT_STATUS -> NEXT_TASK -> _INDEX -> relevant specs only`),
-  - selective spec-loading policy,
-  - mandatory handoff update policy.
-- Created `docs/specs/_INDEX.md` with:
-  - routing-oriented entry format (`path`, `summary`, `tags`, `read-when`),
-  - usage guidance for loading only relevant specs.
-- Created handoff control files:
-  - `docs/handoff/CURRENT_STATUS.md`
-  - `docs/handoff/NEXT_TASK.md`
-- Captured bootstrap next tasks for defining the first authoritative specs.
+- Created shared conda definition file:
+  - `environment.yml` with initial Python/data/graph/analysis dependencies.
+- Added starter candidate manifest:
+  - `data/models.csv` with required header schema.
+- Authored and registered first authoritative specs:
+  - `docs/specs/data-sourcing-and-eligibility.md`
+  - `docs/specs/extraction-and-normalization.md`
+  - `docs/specs/graph-semantics-and-metrics.md`
+  - Added entries in `docs/specs/_INDEX.md` with `summary`, `tags`, and `read-when`.
+- Added explicit deferred-policy markers in specs via `OPEN_DECISION` sections for:
+  - unpinned dependency vulnerability policy,
+  - `depends_on` edge requirement level,
+  - composite risk score decision.
+- Updated operating docs to align with new setup:
+  - `AGENTS.md` now includes concrete conda environment name and setup commands.
+  - `README.md` now reflects `environment.yml`, `data/models.csv`, and agent workflow/read order.
 
 ## Passing checks
 
-- Required docs scaffold exists:
-  - `AGENTS.md`
-  - `docs/specs/_INDEX.md`
-  - `docs/handoff/CURRENT_STATUS.md`
-  - `docs/handoff/NEXT_TASK.md`
-- Read-order policy in `AGENTS.md` matches agreed handoff-first workflow.
-- `_INDEX.md` currently has no registered specs and is ready for first entries.
+- Required planning artifacts now exist:
+  - `environment.yml`
+  - `data/models.csv`
+  - `docs/specs/data-sourcing-and-eligibility.md`
+  - `docs/specs/extraction-and-normalization.md`
+  - `docs/specs/graph-semantics-and-metrics.md`
+- `docs/specs/_INDEX.md` now routes to concrete spec files.
+- `AGENTS.md` no longer contains conda environment `TBD`.
 
 ## Known gaps/blockers
 
-- Project conda environment name is still TBD in `AGENTS.md`.
-- No authoritative specs have been authored yet under `docs/specs/`.
-- `_INDEX.md` has structure but no active spec registrations yet.
+- Model sampling policy is not finalized (manual curation vs automated ranking).
+- Ingestion contract is specified, but no script implementation exists yet.
+- Multiple `OPEN_DECISION` items remain intentionally unresolved until more data is available.
 
 ## Active coordination notes
 
-- Handoff-first context loading is now explicit and should minimize token/context waste.
-- Spec filenames are expected to stay human-readable; stable IDs can be added in `_INDEX.md` when needed.
-- Temporary template reference files were used for style alignment and are now removed from active handoff flow.
+- The ingestion spec intentionally defines a contract only; no extraction script has been implemented.
+- Strict eligibility is now the default policy for initial pipeline iterations.
+- Next implementation should start from `data/models.csv` and produce reproducible artifact/provenance logs.
 
 ## Next task (single target)
 
-Create and register the first authoritative spec set in `docs/specs/` and align `NEXT_TASK.md` task references to those specs.
+Implement a minimal ingestion + eligibility script from the contract spec that reads `data/models.csv` and writes per-model manifest indexes/outcome metadata.
 
 ## Definition of done for next task
 
-- At least one authoritative spec exists in `docs/specs/` with clear scope and invariants.
-- New spec file(s) are registered in `docs/specs/_INDEX.md` with tags and read triggers.
-- `docs/handoff/NEXT_TASK.md` references concrete spec paths for upcoming implementation work.
+- Script exists (initial version) and follows the contract in `docs/specs/extraction-and-normalization.md`.
+- Script reads `data/models.csv` and emits deterministic per-model outputs under `manifests/<model_id>/`.
+- Eligibility pass/fail outcomes are explicit with machine-readable reasons.
+- `NEXT_TASK.md` is updated to point to the subsequent OSV-scan integration step.

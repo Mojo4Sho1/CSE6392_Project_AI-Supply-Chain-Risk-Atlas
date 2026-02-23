@@ -6,9 +6,14 @@ Operational guidance for coding agents working in this repository.
 Build and maintain a reproducible AI Supply Chain Risk Atlas pipeline as described in `README.md`.
 
 ## Environment
-- Preferred environment: `conda` (project-specific environment name TBD)
+- Preferred environment: `conda` via `environment.yml`
+- Environment name: `ai-supply-chain-risk-atlas`
 - Default shell: `zsh`
 - Prefer deterministic, scriptable steps over manual workflows
+
+Environment setup:
+- `conda env create -f environment.yml`
+- `conda activate ai-supply-chain-risk-atlas`
 
 ## Required Read Order (Context-First)
 Agents must follow this order to minimize context pollution:

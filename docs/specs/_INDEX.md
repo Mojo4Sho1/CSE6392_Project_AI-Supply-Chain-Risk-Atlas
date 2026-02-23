@@ -15,9 +15,22 @@ Purpose: route agents to only the specification documents needed for the current
 - `read-when`: explicit trigger for loading this spec
 
 ## Specs
-_No spec files registered yet._
+- `path`: `docs/specs/data-sourcing-and-eligibility.md`
+- `summary`: authoritative candidate-source and strict eligibility rules for model repositories.
+- `tags`: `model-selection`, `eligibility`, `manifest`, `data-sourcing`
+- `read-when`: tasks involve selecting model candidates, validating repo eligibility, or deciding exclusions.
 
-When adding the first spec, use this template:
+- `path`: `docs/specs/extraction-and-normalization.md`
+- `summary`: contract for artifact acquisition, OSV raw output handling, and normalized vulnerability schema.
+- `tags`: `ingestion`, `osv`, `normalization`, `schema`
+- `read-when`: tasks involve fetching dependency artifacts, scanning vulnerabilities, or writing normalized outputs.
+
+- `path`: `docs/specs/graph-semantics-and-metrics.md`
+- `summary`: graph node/edge semantics and required baseline metrics for atlas evaluation.
+- `tags`: `graph`, `metrics`, `networkx`, `risk-structure`
+- `read-when`: tasks involve graph construction, edge rules, deduplication identity, or reporting metrics.
+
+When adding another spec, use this template:
 
 - `path`: `docs/specs/<filename>.md`
 - `summary`: <one to two sentence authoritative scope>

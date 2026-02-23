@@ -75,6 +75,7 @@ This repo is expected to produce and/or store the following artifacts:
 
 ```
 data/
+  models.csv                   # curated candidate list (early-phase source of truth)
   models.json                  # frozen dataset manifest (HF models + repo links)
 repos/
   <model_id>/                  # cloned repos (checked out at recorded commit)
@@ -92,6 +93,12 @@ reports/
   summary.csv                  # tabular metrics / rankings
 figures/
   ...                          # plots / atlas visuals
+docs/
+  specs/
+    _INDEX.md                  # spec routing table for selective agent loading
+  handoff/
+    CURRENT_STATUS.md          # current project status
+    NEXT_TASK.md               # next concrete task batch
 ```
 
 ---
@@ -102,6 +109,10 @@ The dataset is frozen into a single file:
 
 - `data/models.json`
 
+Early project phases may begin with a curated CSV:
+
+- `data/models.csv`
+
 Each entry SHOULD include:
 - `hf_model_id`
 - `likes_at_snapshot` (and optionally downloads)
@@ -111,6 +122,37 @@ Each entry SHOULD include:
 - `dependency_artifacts_found` (filled after ingestion)
 
 This makes the analysis reproducible even if model popularity or repos change over time.
+
+For `data/models.csv`, required columns are:
+- `hf_model_id`
+- `source_repo_url`
+- `selection_rationale`
+- `selection_source`
+- `snapshot_timestamp`
+- `eligible`
+
+---
+
+## Agent Workflow
+
+This repository is set up for agent-to-agent handoff and selective spec loading:
+
+1. Read `AGENTS.md`
+2. Read `docs/handoff/CURRENT_STATUS.md`
+3. Read `docs/handoff/NEXT_TASK.md`
+4. Read `docs/specs/_INDEX.md`
+5. Read only relevant spec files for the active task
+
+---
+
+## Environment Setup
+
+Create and activate the shared conda environment:
+
+```bash
+conda env create -f environment.yml
+conda activate ai-supply-chain-risk-atlas
+```
 
 ---
 

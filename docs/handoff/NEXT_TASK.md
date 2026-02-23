@@ -5,72 +5,75 @@
 
 ## Task summary
 
-Define the first authoritative spec documents for this project and register them in `docs/specs/_INDEX.md` so future agents can route context selectively.
+Implement the first minimal ingestion/eligibility script from the existing contract spec, using `data/models.csv` as input and producing manifest/provenance outputs for each candidate model.
 
 ## Why this task is next
 
-- The operating workflow and handoff contract are now in place.
-- Implementation work should not proceed without at least minimal authoritative specs.
-- `_INDEX.md` is currently empty and cannot yet route task-to-spec selection.
+- Authoritative specs and routing index are now in place.
+- Environment setup and candidate manifest schema are established.
+- Pipeline progress now depends on moving from contract docs to a runnable ingestion baseline.
 
 ## Scope (in)
 
-- Create initial spec files with human-readable names in `docs/specs/` (exact filenames chosen during authoring).
-- Document authoritative semantics for the first execution-critical areas, likely including:
-  - model selection/snapshot rules,
-  - ingestion + dependency artifact capture,
-  - OSV normalization policy and output schema expectations.
-- Register each created spec in `docs/specs/_INDEX.md` using:
-  - `path`
-  - `summary`
-  - `tags`
-  - `read-when`
-- Update `AGENTS.md` once the exact conda environment name is finalized.
+- Implement initial script (path to be chosen during implementation, e.g., `scripts/ingest_repo_artifacts.py`) that:
+  - reads `data/models.csv`,
+  - validates required fields,
+  - evaluates strict eligibility checks,
+  - writes per-model manifest index/outcome metadata under `manifests/<model_id>/`.
+- Ensure outputs include key provenance fields:
+  - source repo URL,
+  - resolved reference/commit when available,
+  - fetch/evaluation timestamp,
+  - explicit eligibility status and reason code.
+- Add brief usage documentation for running the script in the shared conda env.
 
 ## Scope (out)
 
-- Building the full extraction/graph/reporting pipeline.
-- Running full benchmark/data collection jobs.
-- Expanding into non-essential process docs beyond the minimum spec baseline.
+- Full OSV scan integration.
+- Graph construction and reporting.
+- Automated Hugging Face ranking/selection policy.
 
 ## Dependencies / prerequisites
 
-- Core project context:
-  - `README.md`
+- Environment + workflow:
+  - `environment.yml`
   - `AGENTS.md`
-- Routing index:
+- Data and specs:
+  - `data/models.csv`
+  - `docs/specs/data-sourcing-and-eligibility.md`
+  - `docs/specs/extraction-and-normalization.md`
+- Routing:
   - `docs/specs/_INDEX.md`
-- Handoff control:
-  - `docs/handoff/CURRENT_STATUS.md`
 
 ## Implementation notes
 
-- Keep specs short and authoritative; avoid narrative duplication of `README.md`.
-- Prefer explicit invariants, schemas, and decision rules over broad prose.
-- Keep filenames human-readable; use index metadata for routing precision.
+- Keep implementation minimal and deterministic.
+- Treat strict eligibility failures as expected outcomes, not hard crashes.
+- Keep reason codes stable and machine-readable for downstream analysis.
 
 ## Subtasks
 
-- [ ] Create first set of spec files under `docs/specs/`.
-- [ ] Add entries for each spec in `docs/specs/_INDEX.md` with tags and read triggers.
-- [ ] Add concrete spec-path references in this `NEXT_TASK.md` for the next implementation pass.
-- [ ] Finalize and record conda environment name in `AGENTS.md`.
+- [ ] Create ingestion script following contract semantics.
+- [ ] Create/validate output schema for `manifests/<model_id>/manifest_index.json`.
+- [ ] Add explicit eligibility reason taxonomy (e.g., unreachable repo, no supported artifacts, parse failure).
+- [ ] Add short run instructions to `README.md` or script header docstring.
 
 ## Acceptance criteria (definition of done)
 
-- At least one authoritative spec exists and is ready for task routing.
-- `_INDEX.md` maps current task areas to specific spec files without requiring full-spec ingestion.
-- `NEXT_TASK.md` points to concrete spec paths instead of placeholder planning text.
-- `AGENTS.md` environment field no longer contains `TBD` for conda env name.
+- Script runs from shared conda env and processes `data/models.csv` end-to-end.
+- At least one successful and one failed eligibility path are represented in output metadata (using sample rows if needed).
+- Output files are deterministic and reproducible for same inputs.
+- Handoff docs are updated with outcomes and next OSV integration task.
 
 ## Verification checklist
 
-- [ ] `find docs/specs -maxdepth 1 -type f` shows new spec files in addition to `_INDEX.md`.
-- [ ] `rg -n "path|summary|tags|read-when" docs/specs/_INDEX.md`
-- [ ] `rg -n "TBD" AGENTS.md` returns no conda-environment TODO.
+- [ ] `python <script_path> --help` works.
+- [ ] Running script against `data/models.csv` produces `manifests/<model_id>/manifest_index.json` outputs.
+- [ ] `rg -n "eligible|reason|repo_commit_sha|source_repo_url" manifests`
+- [ ] No unresolved placeholder text remains in new script/docs.
 
 ## Risks / rollback notes
 
-- Overly broad specs may create ambiguity and increase agent context load.
-- Missing invariants in early specs can cause downstream rework in normalization/graph stages.
-- If spec scope grows too fast, split into focused files and keep `_INDEX.md` routing granular.
+- GitHub/API variability may affect repo metadata resolution; include clear fallback/unknown states.
+- Overly strict checks may reduce candidate count; this is acceptable for initial baseline.
+- If output schema drifts, update extraction spec and `_INDEX.md` references in the same change.
