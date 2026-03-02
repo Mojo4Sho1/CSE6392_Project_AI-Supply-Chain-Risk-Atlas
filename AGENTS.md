@@ -21,8 +21,27 @@ Agents must follow this order to minimize context pollution:
 1. `AGENTS.md` (this file)
 2. `docs/handoff/CURRENT_STATUS.md`
 3. `docs/handoff/NEXT_TASK.md`
-4. `docs/specs/_INDEX.md`
-5. Only the spec file(s) relevant to active task(s)
+4. `docs/handoff/PROJECT_CHECKLIST.md` (long-horizon context)
+5. `docs/specs/_INDEX.md`
+6. Only the spec file(s) relevant to active task(s)
+
+## New Agent Bootstrap Checklist
+Use this checklist at the start of every new task batch:
+
+1. Environment readiness
+   - `conda env create -f environment.yml` (if env does not exist)
+   - `conda activate ai-supply-chain-risk-atlas`
+2. Context load
+   - read files in the required read order above,
+   - read `docs/specs/decision-log.md` before making policy assumptions.
+3. Execution baseline
+   - run from repository root,
+   - use deterministic/scriptable workflows,
+   - treat `data/models.csv` as human-owned input in v1.
+4. Completion obligations
+   - update `docs/handoff/CURRENT_STATUS.md`,
+   - update `docs/handoff/NEXT_TASK.md`,
+   - if any spec changes, update `docs/specs/_INDEX.md` in the same batch.
 
 ## Spec Loading Policy
 - Do not read all specs by default.

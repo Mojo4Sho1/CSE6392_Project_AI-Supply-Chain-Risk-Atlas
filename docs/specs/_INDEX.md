@@ -4,9 +4,11 @@ Purpose: route agents to only the specification documents needed for the current
 
 ## How to Use
 1. Read `docs/handoff/NEXT_TASK.md`.
-2. Match task scope to entries below.
-3. Open only relevant spec files/sections.
-4. Add new specs here immediately when created.
+2. If planning across phases, read `docs/handoff/PROJECT_CHECKLIST.md`.
+3. Read `docs/specs/decision-log.md` before interpreting policy defaults.
+4. Match task scope to entries below.
+5. Open only relevant spec files/sections.
+6. Add new specs here immediately when created.
 
 ## Entry Format
 - `path`: spec file path
@@ -29,6 +31,26 @@ Purpose: route agents to only the specification documents needed for the current
 - `summary`: graph node/edge semantics and required baseline metrics for atlas evaluation.
 - `tags`: `graph`, `metrics`, `networkx`, `risk-structure`
 - `read-when`: tasks involve graph construction, edge rules, deduplication identity, or reporting metrics.
+
+- `path`: `docs/specs/artifact-schemas.md`
+- `summary`: normative schema contracts, enums, timestamp rules, and deterministic `model_id` normalization.
+- `tags`: `schema`, `contracts`, `manifest`, `osv`, `reports`
+- `read-when`: tasks produce or consume `models.json`, `manifest_index.json`, normalized OSV outputs, or report summaries.
+
+- `path`: `docs/specs/pipeline-execution-contract.md`
+- `summary`: canonical script boundaries, shared CLI contract, exit codes, retry policy, idempotency, and determinism requirements.
+- `tags`: `execution`, `cli`, `idempotency`, `retries`, `runtime`
+- `read-when`: tasks implement or modify pipeline scripts, operational behavior, or run-level error handling.
+
+- `path`: `docs/specs/testing-and-validation.md`
+- `summary`: required unit/integration/smoke coverage and milestone validation gates.
+- `tags`: `testing`, `validation`, `fixtures`, `reproducibility`
+- `read-when`: tasks add code, adjust contracts, or define acceptance criteria/check commands.
+
+- `path`: `docs/specs/decision-log.md`
+- `summary`: accepted policy defaults and change-control rules for previously open project decisions.
+- `tags`: `policy`, `defaults`, `governance`, `decisions`
+- `read-when`: any task depends on policy choices such as sample sizing, unpinned handling, or required graph edges.
 
 When adding another spec, use this template:
 

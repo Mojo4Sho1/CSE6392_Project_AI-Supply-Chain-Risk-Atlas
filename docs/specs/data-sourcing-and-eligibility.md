@@ -4,9 +4,7 @@
 Define authoritative rules for sourcing model candidates and determining whether a model repository is eligible for pipeline processing.
 
 ## Inputs
-- Candidate model list from either:
-  - curated CSV (`data/models.csv`), or
-  - future automated Hugging Face query workflow.
+- Candidate model list from curated CSV (`data/models.csv`) in v1.
 - Minimum CSV columns:
   - `hf_model_id`
   - `source_repo_url`
@@ -18,8 +16,10 @@ Define authoritative rules for sourcing model candidates and determining whether
 ## Authoritative Rules
 
 ### Candidate Source of Truth
-- During early project phases, `data/models.csv` is authoritative for candidate selection.
+- In v1, `data/models.csv` is authoritative for candidate selection.
+- `data/models.csv` rows are human-owned and human-approved in v1.
 - `hf_model_id` and `source_repo_url` are required; rows missing either are invalid.
+- Candidate target size default is 15 models unless handoff docs explicitly override.
 
 ### Eligibility Policy (Strict by Default)
 A candidate is eligible only if all checks pass:
@@ -30,6 +30,8 @@ A candidate is eligible only if all checks pass:
 4. Repo layout allows unambiguous mapping between model and dependency artifacts.
 
 If any check fails, set `eligible=false` and record exclusion reason in processing metadata.
+
+Eligibility reason codes must come from `docs/specs/artifact-schemas.md`.
 
 ### Recognized Dependency Artifacts (initial)
 - Python: `requirements.txt`, `pyproject.toml`, `poetry.lock`, `Pipfile`, `Pipfile.lock`
@@ -45,6 +47,9 @@ If any check fails, set `eligible=false` and record exclusion reason in processi
 - Exclusions are explicit and auditable.
 - No silent skipping of invalid or unreachable repositories.
 
-## Open Decisions
-- `OPEN_DECISION`: automated candidate generation policy (likes/downloads/hybrid) and tie-break strategy.
-- `OPEN_DECISION`: final sample-size target within 10-20 and potential modality stratification.
+## Resolved Defaults for v1
+- Candidate generation is manual curation via `data/models.csv`.
+- Default sample target is 15 models.
+- Automated ranking policy is deferred.
+
+Decision authority: `docs/specs/decision-log.md`.

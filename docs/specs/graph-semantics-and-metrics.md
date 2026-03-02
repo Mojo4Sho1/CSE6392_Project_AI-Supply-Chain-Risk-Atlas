@@ -3,6 +3,8 @@
 ## Purpose
 Define authoritative graph structure, node/edge semantics, and baseline evaluation metrics for the risk atlas.
 
+Report schema details are defined in `docs/specs/artifact-schemas.md`.
+
 ## Graph Types
 - Primary graph: global typed graph at `graphs/global.graphml`.
 - Optional outputs: per-model subgraphs at `graphs/per_model/<model_id>.graphml`.
@@ -36,7 +38,8 @@ Identity invariant:
 
 ### Optional / deferred
 - `depends_on` (Package -> Package)
-  - include only when dependency relationship is observed with sufficient provenance.
+  - deferred for v1,
+  - include only in future versions when dependency relationship is observed with sufficient provenance.
 
 ## Baseline Metrics (required)
 
@@ -53,6 +56,9 @@ Identity invariant:
 - Most reused vulnerable packages across models
 - Distribution of impacted-model counts per vulnerable package
 
-## Open Decisions
-- `OPEN_DECISION`: v1 requirement level for `depends_on` edges (required now vs phase-gated later).
-- `OPEN_DECISION`: whether to introduce a composite risk score; if adopted, formula and calibration must be documented and justified.
+## Resolved Defaults for v1
+
+- `depends_on` edges are deferred and not required for v1 completion.
+- Composite risk score is out of scope; baseline metrics are required.
+
+Decision authority: `docs/specs/decision-log.md`.

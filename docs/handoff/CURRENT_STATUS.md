@@ -1,61 +1,70 @@
 # Current Status
 
-**Last updated:** 2026-02-23  
+**Last updated:** 2026-03-02  
 **Owner:** Joe + Codex
 
 ## Current focus
 
-Translate planning decisions into authoritative project specs and shared environment setup.
+Documentation hardening for zero-context agent execution across milestones M1-M4.
 
 ## Completed in current focus
 
-- Created shared conda definition file:
-  - `environment.yml` with initial Python/data/graph/analysis dependencies.
-- Added starter candidate manifest:
-  - `data/models.csv` with required header schema.
-- Authored and registered first authoritative specs:
+- Added end-to-end master checklist:
+  - `docs/handoff/PROJECT_CHECKLIST.md` with phase gates, dependencies, and acceptance criteria for M1-M4.
+- Added new authoritative specs:
+  - `docs/specs/artifact-schemas.md`
+  - `docs/specs/pipeline-execution-contract.md`
+  - `docs/specs/testing-and-validation.md`
+  - `docs/specs/decision-log.md`
+- Updated specs index routing:
+  - `docs/specs/_INDEX.md` now includes all active specs and read triggers.
+- Resolved policy defaults previously tracked as open decisions:
+  - manual curated candidate source (`data/models.csv`) for v1,
+  - default sample target of 15,
+  - unpinned dependencies map to `vuln_status=unknown`,
+  - ambiguous refs resolve to default-branch `HEAD` with provenance,
+  - `depends_on` edges deferred in v1,
+  - composite risk score out of scope in v1.
+- Updated existing specs to align with resolved defaults:
   - `docs/specs/data-sourcing-and-eligibility.md`
   - `docs/specs/extraction-and-normalization.md`
   - `docs/specs/graph-semantics-and-metrics.md`
-  - Added entries in `docs/specs/_INDEX.md` with `summary`, `tags`, and `read-when`.
-- Added explicit deferred-policy markers in specs via `OPEN_DECISION` sections for:
-  - unpinned dependency vulnerability policy,
-  - `depends_on` edge requirement level,
-  - composite risk score decision.
-- Updated operating docs to align with new setup:
-  - `AGENTS.md` now includes concrete conda environment name and setup commands.
-  - `README.md` now reflects `environment.yml`, `data/models.csv`, and agent workflow/read order.
+- Updated operational docs for consistency:
+  - `README.md` now reflects artifact-only ingestion and v1 policy defaults.
+  - `AGENTS.md` now includes a new-agent bootstrap checklist.
+  - `docs/handoff/NEXT_TASK.md` now points to the next executable M1 implementation batch.
 
 ## Passing checks
 
-- Required planning artifacts now exist:
-  - `environment.yml`
-  - `data/models.csv`
-  - `docs/specs/data-sourcing-and-eligibility.md`
-  - `docs/specs/extraction-and-normalization.md`
-  - `docs/specs/graph-semantics-and-metrics.md`
-- `docs/specs/_INDEX.md` now routes to concrete spec files.
-- `AGENTS.md` no longer contains conda environment `TBD`.
+- All new doc artifacts from the documentation hardening plan are present.
+- `docs/specs/_INDEX.md` includes routing entries for every active spec.
+- Core policy defaults are now explicit in `docs/specs/decision-log.md`.
+- Existing README/spec conflict on ingestion behavior is resolved to artifact-only v1 flow.
 
 ## Known gaps/blockers
 
-- Model sampling policy is not finalized (manual curation vs automated ranking).
-- Ingestion contract is specified, but no script implementation exists yet.
-- Multiple `OPEN_DECISION` items remain intentionally unresolved until more data is available.
+- No ingestion script implementation exists yet.
+- No OSV scan, graph build, or reporting scripts exist yet.
+- `data/models.csv` still needs human-populated candidate rows for full run execution.
 
 ## Active coordination notes
 
-- The ingestion spec intentionally defines a contract only; no extraction script has been implemented.
-- Strict eligibility is now the default policy for initial pipeline iterations.
-- Next implementation should start from `data/models.csv` and produce reproducible artifact/provenance logs.
+- Documentation baseline is now decision-complete for implementation.
+- Next implementation should follow M1 gate requirements from:
+  - `docs/handoff/PROJECT_CHECKLIST.md`
+  - `docs/specs/artifact-schemas.md`
+  - `docs/specs/pipeline-execution-contract.md`
 
 ## Next task (single target)
 
-Implement a minimal ingestion + eligibility script from the contract spec that reads `data/models.csv` and writes per-model manifest indexes/outcome metadata.
+Implement `scripts/ingest_repo_artifacts.py` to produce deterministic per-model manifest outputs from `data/models.csv` using canonical schemas and reason codes.
 
 ## Definition of done for next task
 
-- Script exists (initial version) and follows the contract in `docs/specs/extraction-and-normalization.md`.
-- Script reads `data/models.csv` and emits deterministic per-model outputs under `manifests/<model_id>/`.
-- Eligibility pass/fail outcomes are explicit with machine-readable reasons.
-- `NEXT_TASK.md` is updated to point to the subsequent OSV-scan integration step.
+- Script exists and follows:
+  - `docs/specs/extraction-and-normalization.md`
+  - `docs/specs/artifact-schemas.md`
+  - `docs/specs/pipeline-execution-contract.md`
+- Script emits deterministic `manifests/<model_id>/manifest_index.json` outputs.
+- Eligibility pass/fail outcomes use canonical machine-readable reason codes.
+- `NEXT_TASK.md` is updated to point to subsequent M2 OSV-scan integration.

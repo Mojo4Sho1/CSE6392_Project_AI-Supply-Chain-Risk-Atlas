@@ -10,10 +10,12 @@ Define the contract for repository artifact extraction, OSV scan execution, and 
 3. OSV scan execution on acquired artifacts.
 4. Normalization into stable JSON schema under `osv/<model_id>/normalized.json`.
 
+Normative schemas and enums are defined in `docs/specs/artifact-schemas.md`.
+
 ## Repository Artifact Acquisition Contract
 
 ### Goal
-Acquire only required dependency artifacts and minimal provenance metadata, without full repository cloning by default.
+Acquire only required dependency artifacts and minimal provenance metadata, without full repository cloning in v1.
 
 ### Contract (No Implementation in this Spec)
 A future ingestion script (e.g., `scripts/ingest_repo_artifacts.py`) must:
@@ -23,9 +25,10 @@ A future ingestion script (e.g., `scripts/ingest_repo_artifacts.py`) must:
   - `source_repo_url`
   - optional commit SHA or ref
 - Behavior:
-  - Discover and fetch dependency-related files only.
+  - Discover and fetch dependency-related files only (`artifact_only` mode).
   - Record provenance metadata (repo URL, resolved commit/ref, fetch timestamp).
   - Record acquisition outcome and exclusion reason if strict eligibility fails.
+  - Resolve ambiguous or missing ref to default-branch `HEAD` and record strategy.
 - Output:
   - `manifests/<model_id>/manifest_index.json`
   - optional local artifact cache for scanner input
@@ -38,14 +41,17 @@ A future ingestion script (e.g., `scripts/ingest_repo_artifacts.py`) must:
 For each eligible model:
 - Persist raw output to `osv/<model_id>/raw.json`.
 - Normalize to `osv/<model_id>/normalized.json`.
+- Normalized outputs must follow `docs/specs/artifact-schemas.md`.
 
 ## Normalized Schema (minimum required fields)
 Top-level:
 - `schema_version` (string; start with `1.0`)
-- `generated_at` (ISO timestamp)
+- `generated_at_utc` (UTC ISO timestamp)
 - `hf_model_id`
+- `model_id`
 - `source_repo_url`
-- `repo_commit_sha` (or `unknown` with reason)
+- `repo_commit_sha` (or `unknown`)
+- `repo_commit_sha_reason`
 - `scanner`
   - `name`
   - `version`
@@ -66,7 +72,12 @@ Per package entry:
 - Raw and normalized outputs must be generated together for traceability.
 - `schema_version` must be present on all normalized outputs.
 - Package identity for downstream graphing is `(ecosystem, name, version)`.
+- Unpinned dependency policy in v1: `vuln_status=unknown`.
+- Eligibility reason codes must use canonical enum values from `docs/specs/artifact-schemas.md`.
 
-## Open Decisions
-- `OPEN_DECISION`: unpinned dependency policy for `vuln_status` (`unknown` only vs `potentially_vulnerable`).
-- `OPEN_DECISION`: default strategy for commit resolution when repo refs are ambiguous.
+## Resolved Defaults for v1
+
+- Ambiguous repo refs resolve to default-branch `HEAD` with provenance capture.
+- Unpinned dependencies map to `vuln_status=unknown`.
+
+Decision authority: `docs/specs/decision-log.md`.

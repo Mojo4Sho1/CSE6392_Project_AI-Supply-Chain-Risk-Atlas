@@ -25,7 +25,7 @@ This project builds a **typed dependency graph** over a small sample of **popula
 ## Scope
 
 ### Included
-- **10–20 popular Hugging Face models** (sample is intentionally constrained)
+- **10–20 popular Hugging Face models** (sample is intentionally constrained; v1 target is 15)
 - Models with:
   - A **public source repository** available
   - **Usable dependency artifacts** (manifests and/or lockfiles)
@@ -34,25 +34,24 @@ This project builds a **typed dependency graph** over a small sample of **popula
 - Closed-source models
 - Repos with insufficient dependency visibility (e.g., no manifests/lockfiles, or artifacts that cannot be scanned)
 
-> Note: Vulnerability data is typically **package + version scoped**. If a repo does not pin versions, some findings may be marked as **unknown** or **potential** exposure depending on the policy described below.
+> Note: Vulnerability data is typically **package + version scoped**. In v1, if a repo does not pin versions, findings are marked as **unknown**.
 
 ---
 
 ## High-Level Pipeline
 
 1. **Model selection**
-   - Query Hugging Face metadata
-   - Identify top-liked models
-   - Filter to those with public repos and scannable dependency artifacts
+   - Use human-curated rows in `data/models.csv` (v1 default)
+   - Validate candidate rows against strict eligibility policy
    - Freeze the dataset into a snapshot manifest
 
 2. **Repo ingestion**
-   - Clone each selected repo
+   - Fetch dependency artifacts only (artifact-only mode)
    - Record commit SHA
    - Collect dependency artifacts (e.g., `requirements.txt`, `poetry.lock`, `package.json`, lockfiles)
 
 3. **Dependency + vulnerability extraction**
-   - Run **OSV-Scanner** over each repo / dependency file set
+   - Run **OSV-Scanner** over each selected model's dependency artifact set
    - Store raw scanner outputs
    - Normalize results into a stable schema for graph construction
 
@@ -77,8 +76,6 @@ This repo is expected to produce and/or store the following artifacts:
 data/
   models.csv                   # curated candidate list (early-phase source of truth)
   models.json                  # frozen dataset manifest (HF models + repo links)
-repos/
-  <model_id>/                  # cloned repos (checked out at recorded commit)
 manifests/
   <model_id>/manifest_index.json
 osv/
@@ -96,9 +93,11 @@ figures/
 docs/
   specs/
     _INDEX.md                  # spec routing table for selective agent loading
+    decision-log.md            # accepted policy defaults and change-control
   handoff/
     CURRENT_STATUS.md          # current project status
     NEXT_TASK.md               # next concrete task batch
+    PROJECT_CHECKLIST.md       # end-to-end milestone checklist and gates
 ```
 
 ---
@@ -123,6 +122,11 @@ Each entry SHOULD include:
 
 This makes the analysis reproducible even if model popularity or repos change over time.
 
+v1 policy defaults:
+- `data/models.csv` is human-owned input.
+- default sample target is 15 models.
+- automated model ranking is deferred.
+
 For `data/models.csv`, required columns are:
 - `hf_model_id`
 - `source_repo_url`
@@ -140,8 +144,18 @@ This repository is set up for agent-to-agent handoff and selective spec loading:
 1. Read `AGENTS.md`
 2. Read `docs/handoff/CURRENT_STATUS.md`
 3. Read `docs/handoff/NEXT_TASK.md`
-4. Read `docs/specs/_INDEX.md`
-5. Read only relevant spec files for the active task
+4. Read `docs/handoff/PROJECT_CHECKLIST.md`
+5. Read `docs/specs/_INDEX.md`
+6. Read only relevant spec files for the active task
+
+## Authoritative Contracts
+
+For implementation decisions, use these specs:
+
+- `docs/specs/decision-log.md` (policy defaults)
+- `docs/specs/artifact-schemas.md` (artifact schemas + enums)
+- `docs/specs/pipeline-execution-contract.md` (CLI/runtime behavior)
+- `docs/specs/testing-and-validation.md` (required validation gates)
 
 ---
 
@@ -194,6 +208,8 @@ Indicates package-to-package dependency relationships.
 Recommended attributes:
 - `edge_source`: lockfile vs scanner-derived dependency graph (if available)
 
+> v1 default: `depends_on` is deferred and not required for milestone completion.
+
 ---
 
 ## Vulnerability Annotation
@@ -205,7 +221,6 @@ Recommended package vulnerability fields:
   - `vulnerable` (known version matches an affected range)
   - `not_vulnerable` (known version does not match)
   - `unknown` (version is missing / cannot evaluate precisely)
-  - `potentially_vulnerable` (optional label if using “unpinned = possible exposure” policy)
 - `vuln_ids`: list of OSV/CVE/GHSA identifiers
 - `num_vulns`: integer count of unique `vuln_ids`
 - `max_severity_bucket`: `LOW | MEDIUM | HIGH | CRITICAL | UNKNOWN`
@@ -216,7 +231,7 @@ Recommended package vulnerability fields:
 Because vulnerability matching is package+version scoped:
 
 - If a lockfile pins versions, vulnerability status is **observed** (`vulnerable` / `not_vulnerable`).
-- If versions are unpinned, status may be **unknown** (default) unless explicitly treated as **potential exposure**.
+- If versions are unpinned, status is **unknown** in v1.
 
 This policy should remain consistent across all models in the dataset.
 
@@ -245,11 +260,11 @@ This policy should remain consistent across all models in the dataset.
 ## Milestones
 
 ### M1 — Project scoping & model selection
-- Finalize 10–20 models with public repos and scannable dependency artifacts
+- Finalize 10–20 models with public repos and scannable dependency artifacts (v1 target 15)
 - Generate `data/models.json` with snapshot metadata
 
 ### M2 — Dependency + vulnerability extraction
-- Run OSV scanning across all selected repos
+- Run OSV scanning across all selected model artifact sets
 - Normalize outputs into a stable schema (`osv/<model_id>/normalized.json`)
 
 ### M3 — Graph construction & validation
