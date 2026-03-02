@@ -8,18 +8,23 @@ Define authoritative rules for sourcing model candidates and determining whether
 - Minimum CSV columns:
   - `hf_model_id`
   - `source_repo_url`
-  - `selection_rationale`
-  - `selection_source`
-  - `snapshot_timestamp`
-  - `eligible`
+  - `snapshot_timestamp_utc`
+  - `hf_likes_at_snapshot`
+  - `hf_downloads_at_snapshot`
+  - `ranking_signal`
+  - `selection_method`
+  - `curation_notes` (optional)
 
 ## Authoritative Rules
 
 ### Candidate Source of Truth
 - In v1, `data/models.csv` is authoritative for candidate selection.
 - `data/models.csv` rows are human-owned and human-approved in v1.
+- Each row in `data/models.csv` represents a final selected model candidate for ingestion.
 - `hf_model_id` and `source_repo_url` are required; rows missing either are invalid.
 - Candidate target size default is 15 models unless handoff docs explicitly override.
+- Dependency artifact details are not manually curated in CSV and must be discovered during ingestion.
+- `eligible` is a runtime-derived field recorded in output artifacts, not a CSV input field.
 
 ### Eligibility Policy (Strict by Default)
 A candidate is eligible only if all checks pass:

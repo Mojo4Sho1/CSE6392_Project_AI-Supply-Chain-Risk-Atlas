@@ -10,7 +10,11 @@ Define required test coverage, milestone validation gates, and reproducibility c
 Coverage expectations:
 
 - `model_id` normalization is deterministic and collision-resistant.
+- `models.csv` header contract validation enforces the exact v1 schema (no legacy aliases).
 - CSV required-field validation maps failures to canonical reason codes.
+- `hf_likes_at_snapshot` and `hf_downloads_at_snapshot` validate as non-negative integers.
+- `snapshot_timestamp_utc` validates as UTC `Z`-suffix timestamp.
+- `ranking_signal` and `selection_method` validate against allowed enums.
 - Eligibility reason-code mapping is stable and complete.
 - Schema serialization helper behavior is deterministic.
 - `vuln_status` handling for unpinned versions always returns `unknown` in v1.
@@ -45,6 +49,7 @@ Coverage expectations:
 Fixtures must include at least:
 
 - one row that should pass eligibility,
+- one row with legacy header fields that should fail input-contract validation,
 - one row that should fail `ERR_REPO_UNREACHABLE`,
 - one row that should fail `ERR_NO_SUPPORTED_ARTIFACTS`,
 - one row that should fail `ERR_ARTIFACT_PARSE_FAILED`.

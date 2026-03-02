@@ -26,6 +26,8 @@ This file is the long-horizon control document for zero-context agents.
   - `conda activate ai-supply-chain-risk-atlas`
 - Input source:
   - `data/models.csv` is authoritative for v1 candidate intake.
+  - rows are final selected candidates only; no rejected rows are tracked in this file.
+  - dependency artifact types and eligibility are runtime-derived, not human-entered CSV fields.
 - Determinism:
   - iterate candidates in stable sorted order,
   - serialize JSON with stable key ordering,
@@ -56,6 +58,9 @@ Build deterministic artifact-ingestion outputs from `data/models.csv` under stri
 **Checklist**
 - [ ] Implement ingestion script contract.
 - [ ] Enforce required CSV fields and strict eligibility checks.
+- [ ] Validate CSV header as exact hard-cutover v1 schema.
+- [ ] Validate snapshot/metric/enum input constraints from schema spec.
+- [ ] Discover dependency artifacts at runtime from repository sources.
 - [ ] Emit canonical eligibility `reason_code` values.
 - [ ] Capture provenance (`source_repo_url`, resolved ref, commit SHA or unknown reason, evaluation timestamp).
 - [ ] Guarantee deterministic output formatting and ordering.
@@ -64,6 +69,7 @@ Build deterministic artifact-ingestion outputs from `data/models.csv` under stri
 - [ ] At least one eligible and one ineligible path represented in outputs (fixtures or real rows).
 - [ ] All manifest files validate against the v1 manifest schema.
 - [ ] No undocumented reason codes are emitted.
+- [ ] Legacy CSV schema variants fail with explicit input-contract errors.
 
 ### M2: OSV Scan and Normalization
 

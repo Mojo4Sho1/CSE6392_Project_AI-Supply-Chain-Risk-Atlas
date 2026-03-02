@@ -112,28 +112,35 @@ Early project phases may begin with a curated CSV:
 
 - `data/models.csv`
 
-Each entry SHOULD include:
-- `hf_model_id`
-- `likes_at_snapshot` (and optionally downloads)
-- `snapshot_timestamp`
-- `source_repo_url`
-- `repo_commit_sha` (filled after ingestion)
-- `dependency_artifacts_found` (filled after ingestion)
+In v1, `data/models.csv` is a human-curated input file containing final selected candidates only.
 
-This makes the analysis reproducible even if model popularity or repos change over time.
+This makes analysis reproducible even if model popularity or repository state changes over time.
 
 v1 policy defaults:
 - `data/models.csv` is human-owned input.
 - default sample target is 15 models.
 - automated model ranking is deferred.
+- dependency artifact/file-type data is discovered during ingestion, not entered manually in CSV.
 
 For `data/models.csv`, required columns are:
-- `hf_model_id`
-- `source_repo_url`
-- `selection_rationale`
-- `selection_source`
-- `snapshot_timestamp`
-- `eligible`
+
+| Column | Type | Required | Allowed values / format | Meaning |
+|---|---|---|---|---|
+| `hf_model_id` | string | yes | non-empty | Hugging Face model ID (for example `org/model`) |
+| `source_repo_url` | string | yes | public repo URL | Canonical source repository URL |
+| `snapshot_timestamp_utc` | string | yes | `YYYY-MM-DDTHH:MM:SSZ` | Time the popularity metrics were captured |
+| `hf_likes_at_snapshot` | integer | yes | `>= 0` | Likes value at snapshot time |
+| `hf_downloads_at_snapshot` | integer | yes | `>= 0` | Downloads value at snapshot time |
+| `ranking_signal` | enum | yes | `likes`, `downloads`, `hybrid` | Primary signal used for inclusion |
+| `selection_method` | enum | yes | `manual_hf_top_scan_v1` | Controlled selection method label |
+| `curation_notes` | string | no | free text | Optional operator notes |
+
+### How To Curate `models.csv` Rows (v1)
+
+1. Find top candidate models on Hugging Face using likes/downloads.
+2. Keep only models with public source repositories.
+3. Enter one row per final selected candidate with snapshot metrics and selection metadata.
+4. Do not prefill dependency artifact types or eligibility outcomes; ingestion computes those.
 
 ---
 
@@ -180,7 +187,7 @@ Represents a Hugging Face model in the selected sample.
 Minimum attributes:
 - `hf_model_id`
 - `source_repo_url`
-- `snapshot_timestamp`
+- `snapshot_timestamp_utc`
 
 #### 2) `Package`
 Represents a dependency package used by one or more model repos.

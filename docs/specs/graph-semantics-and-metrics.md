@@ -15,7 +15,7 @@ Report schema details are defined in `docs/specs/artifact-schemas.md`.
 Required attributes:
 - `hf_model_id`
 - `source_repo_url`
-- `snapshot_timestamp`
+- `snapshot_timestamp_utc`
 
 ### Package Node
 Required attributes:

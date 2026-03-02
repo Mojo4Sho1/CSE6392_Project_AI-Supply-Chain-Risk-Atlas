@@ -1,1 +1,1 @@
-hf_model_id,source_repo_url,selection_rationale,selection_source,snapshot_timestamp,eligible
+hf_model_id,source_repo_url,snapshot_timestamp_utc,hf_likes_at_snapshot,hf_downloads_at_snapshot,ranking_signal,selection_method,curation_notes

@@ -18,6 +18,8 @@ Record resolved project policy defaults that were previously open decisions, plu
   - Keeps early iterations deterministic and human-auditable.
 - Impact:
   - agents validate and consume rows; they do not auto-populate `data/models.csv`.
+  - each CSV row represents a final selected candidate for ingestion.
+  - dependency artifact types and eligibility are runtime-derived, not manual CSV fields.
 
 ### DEC-002: Target sample size (v1)
 

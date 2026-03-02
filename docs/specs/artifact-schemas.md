@@ -83,12 +83,19 @@ Rationale:
 - `hf_model_id` (string)
 - `model_id` (string)
 - `source_repo_url` (string)
-- `selection_rationale` (string)
-- `selection_source` (string)
-- `snapshot_timestamp` (timestamp)
-- `eligible` (boolean)
+- `snapshot_timestamp_utc` (timestamp)
+- `hf_likes_at_snapshot` (integer, `>=0`)
+- `hf_downloads_at_snapshot` (integer, `>=0`)
+- `ranking_signal` (enum: `likes` | `downloads` | `hybrid`)
+- `selection_method` (enum: `manual_hf_top_scan_v1`)
+- `curation_notes` (string, optional)
+- `eligible` (boolean, runtime-derived; not human-entered in CSV)
 - `repo_commit_sha` (string; SHA or `unknown`)
 - `dependency_artifacts_found` (array of strings; may be empty)
+
+Validation rules:
+- `hf_likes_at_snapshot` and `hf_downloads_at_snapshot` must parse as non-negative integers.
+- `snapshot_timestamp_utc` must be UTC with `Z` suffix.
 
 ## Schema: `manifests/<model_id>/manifest_index.json`
 
@@ -99,7 +106,7 @@ Rationale:
 - `hf_model_id` (string)
 - `model_id` (string)
 - `source_repo_url` (string)
-- `snapshot_timestamp` (timestamp copied from input row)
+- `snapshot_timestamp_utc` (timestamp copied from input row)
 - `resolved_reference` (object)
 - `artifact_fetch` (object)
 - `eligibility` (object)

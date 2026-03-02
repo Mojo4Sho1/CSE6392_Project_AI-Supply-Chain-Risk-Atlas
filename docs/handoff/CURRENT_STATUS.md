@@ -9,6 +9,10 @@ Documentation hardening for zero-context agent execution across milestones M1-M4
 
 ## Completed in current focus
 
+- Applied `data/models.csv` schema cutover for human-curated selection metadata:
+  - removed ambiguous input columns (`selection_rationale`, `selection_source`, `snapshot_timestamp`, `eligible`)
+  - added canonical v1 selection columns (`snapshot_timestamp_utc`, likes/download counts, ranking signal, method, notes)
+  - clarified that dependency artifacts and eligibility are runtime-derived during ingestion.
 - Added end-to-end master checklist:
   - `docs/handoff/PROJECT_CHECKLIST.md` with phase gates, dependencies, and acceptance criteria for M1-M4.
 - Added new authoritative specs:
@@ -29,10 +33,10 @@ Documentation hardening for zero-context agent execution across milestones M1-M4
   - `docs/specs/data-sourcing-and-eligibility.md`
   - `docs/specs/extraction-and-normalization.md`
   - `docs/specs/graph-semantics-and-metrics.md`
+  - `docs/specs/artifact-schemas.md` (revised `models.json` per-model metadata contract)
 - Updated operational docs for consistency:
-  - `README.md` now reflects artifact-only ingestion and v1 policy defaults.
-  - `AGENTS.md` now includes a new-agent bootstrap checklist.
-  - `docs/handoff/NEXT_TASK.md` now points to the next executable M1 implementation batch.
+  - `README.md` now reflects the new `models.csv` schema and curation workflow.
+  - `docs/handoff/NEXT_TASK.md` now includes explicit schema/type/enum/timestamp validation requirements for M1 ingestion.
 
 ## Passing checks
 
@@ -40,12 +44,13 @@ Documentation hardening for zero-context agent execution across milestones M1-M4
 - `docs/specs/_INDEX.md` includes routing entries for every active spec.
 - Core policy defaults are now explicit in `docs/specs/decision-log.md`.
 - Existing README/spec conflict on ingestion behavior is resolved to artifact-only v1 flow.
+- Cross-doc references for `models.csv` are updated to the hard-cutover schema.
 
 ## Known gaps/blockers
 
 - No ingestion script implementation exists yet.
 - No OSV scan, graph build, or reporting scripts exist yet.
-- `data/models.csv` still needs human-populated candidate rows for full run execution.
+- `data/models.csv` still needs human-populated candidate rows using the new schema columns.
 
 ## Active coordination notes
 

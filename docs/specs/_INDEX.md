@@ -18,9 +18,9 @@ Purpose: route agents to only the specification documents needed for the current
 
 ## Specs
 - `path`: `docs/specs/data-sourcing-and-eligibility.md`
-- `summary`: authoritative candidate-source and strict eligibility rules for model repositories.
+- `summary`: authoritative human-curated candidate CSV schema and strict eligibility rules for model repositories.
 - `tags`: `model-selection`, `eligibility`, `manifest`, `data-sourcing`
-- `read-when`: tasks involve selecting model candidates, validating repo eligibility, or deciding exclusions.
+- `read-when`: tasks involve selecting model candidates, validating `models.csv` schema, evaluating repo eligibility, or deciding exclusions.
 
 - `path`: `docs/specs/extraction-and-normalization.md`
 - `summary`: contract for artifact acquisition, OSV raw output handling, and normalized vulnerability schema.
@@ -33,7 +33,7 @@ Purpose: route agents to only the specification documents needed for the current
 - `read-when`: tasks involve graph construction, edge rules, deduplication identity, or reporting metrics.
 
 - `path`: `docs/specs/artifact-schemas.md`
-- `summary`: normative schema contracts, enums, timestamp rules, and deterministic `model_id` normalization.
+- `summary`: normative schema contracts, enums, `models.csv`-aligned selection metadata fields, timestamp rules, and deterministic `model_id` normalization.
 - `tags`: `schema`, `contracts`, `manifest`, `osv`, `reports`
 - `read-when`: tasks produce or consume `models.json`, `manifest_index.json`, normalized OSV outputs, or report summaries.
 
