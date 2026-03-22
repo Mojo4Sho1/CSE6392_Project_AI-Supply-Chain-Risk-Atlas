@@ -14,7 +14,7 @@ Coverage expectations:
 - CSV required-field validation maps failures to canonical reason codes.
 - `hf_likes_at_snapshot` and `hf_downloads_at_snapshot` validate as non-negative integers.
 - `snapshot_timestamp_utc` validates as UTC `Z`-suffix timestamp.
-- `ranking_signal` and `selection_method` validate against allowed enums.
+- Legacy CSV columns (e.g., `ranking_signal`, `selection_method`, `eligible`, `selection_source`) in header trigger input-contract rejection.
 - Eligibility reason-code mapping is stable and complete.
 - Schema serialization helper behavior is deterministic.
 - `vuln_status` handling for unpinned versions always returns `unknown` in v1.

@@ -1,101 +1,100 @@
 # Next Task
 
-**Last updated:** 2026-03-02  
-**Owner:** Joe + Codex
+**Last updated:** 2026-03-21
+**Owner:** Joe
 
 ## Task summary
 
-Implement M1 ingestion and eligibility baseline as the first executable batch under the new decision-complete contracts, using `data/models.csv` as input and producing deterministic `manifests/<model_id>/manifest_index.json` outputs.
+Implement M1 ingestion and eligibility baseline: build `scripts/ingest_repo_artifacts.py` that reads `data/models.csv` and produces deterministic `manifests/<model_id>/manifest_index.json` outputs.
+
+**Task queue references:** T-007 through T-013 (see `docs/handoff/TASK_QUEUE.md`)
 
 ## Why this task is next
 
-- End-to-end governance and milestone gates now exist in `docs/handoff/PROJECT_CHECKLIST.md`.
-- Policy defaults and schema contracts are now resolved in specs.
-- The highest-priority remaining gap is turning M1 docs into runnable ingestion code.
+- Phase 0 scaffolding is complete (CSV reconciled, specs aligned, agent docs created).
+- All policy defaults are resolved in `docs/specs/decision-log.md` (DEC-001 through DEC-008).
+- The highest-priority gap is turning M1 specs into runnable code.
 
 Long-horizon reference:
-- `docs/handoff/PROJECT_CHECKLIST.md` (full M1-M4 execution runway)
+- `docs/handoff/CAMPAIGN_PLAN.md` (phased roadmap)
+- `docs/handoff/PROJECT_CHECKLIST.md` (milestone gates)
+
+## Recommended task order
+
+Tasks T-007 and T-008 have no interdependencies and can be started in parallel:
+
+1. **T-007:** Implement `model_id` normalization utility + tests
+2. **T-008:** Implement CSV parser with v1 schema validation + tests
+3. **T-009:** Implement artifact discovery with hint support + tests
+4. **T-010:** Implement eligibility evaluation + tests
+5. **T-011:** Assemble `ingest_repo_artifacts.py` with CLI contract
+6. **T-012:** Create Makefile with `ingest`/`test` targets
+7. **T-013:** End-to-end M1 smoke test
 
 ## Scope (in)
 
 - Implement `scripts/ingest_repo_artifacts.py` that:
-  - reads `data/models.csv`,
-  - validates required fields against the hard-cutover CSV schema,
-  - validates timestamp/enum/integer constraints for selection metadata,
+  - reads `data/models.csv` (9-column v1 schema),
+  - validates required fields and timestamp format,
+  - parses human-readable shorthand for `hf_likes_at_snapshot` (e.g., "2.59k" → 2590),
+  - uses `dependency_artifact_url` as hint when present,
   - evaluates strict eligibility checks,
-  - writes per-model manifest index/outcome metadata under `manifests/<model_id>/`.
+  - writes per-model manifest under `manifests/<model_id>/`.
 - Enforce canonical `eligibility_reason_code` values from `docs/specs/artifact-schemas.md`.
-- Implement deterministic `model_id` normalization contract from `docs/specs/artifact-schemas.md`.
-- Ensure manifest output matches `manifests/<model_id>/manifest_index.json` schema contract.
-- Add short run instructions in script docstring and README if needed.
+- Implement deterministic `model_id` normalization from `docs/specs/artifact-schemas.md`.
+- Write unit tests and smoke tests (see `AGENTS.md` testing policy).
+- Create `Makefile` with at least `make test` and `make ingest` targets.
 
 ## Scope (out)
 
-- Full OSV scan integration.
-- Graph construction and reporting.
+- OSV scan integration (Phase 2).
+- Graph construction and reporting (Phases 3–4).
 - Automated Hugging Face ranking/selection policy.
 
 ## Dependencies / prerequisites
 
-- Environment + workflow:
-  - `environment.yml`
-  - `AGENTS.md`
-  - `docs/handoff/PROJECT_CHECKLIST.md`
-- Data and specs:
-  - `data/models.csv`
-  - `docs/specs/data-sourcing-and-eligibility.md`
-  - `docs/specs/extraction-and-normalization.md`
-  - `docs/specs/artifact-schemas.md`
-  - `docs/specs/pipeline-execution-contract.md`
-  - `docs/specs/testing-and-validation.md`
-  - `docs/specs/decision-log.md`
-- Routing:
-  - `docs/specs/_INDEX.md`
+- Quick orientation: `docs/handoff/QUICK_REFERENCE.md`
+- Environment: `environment.yml`, `AGENTS.md`
+- Data: `data/models.csv`
+- Specs (read only what's needed per task):
+  - `docs/specs/artifact-schemas.md` — schemas, enums, model_id normalization
+  - `docs/specs/data-sourcing-and-eligibility.md` — CSV schema, eligibility rules
+  - `docs/specs/extraction-and-normalization.md` — artifact fetching contract
+  - `docs/specs/pipeline-execution-contract.md` — CLI flags, exit codes
+  - `docs/specs/testing-and-validation.md` — test fixtures, coverage gates
 
 ## Implementation notes
 
 - Keep implementation minimal and deterministic.
-- Treat strict eligibility failures as expected outcomes, not hard crashes.
-- Keep reason codes stable and machine-readable for downstream analysis.
-- Hard-cutover rule: old input columns (`selection_rationale`, `selection_source`, `snapshot_timestamp`, `eligible`) must be treated as invalid input schema.
-
-## Subtasks
-
-- [ ] Create `scripts/ingest_repo_artifacts.py` with required common CLI contract flags.
-- [ ] Validate CSV header equals canonical v1 columns only.
-- [ ] Validate `hf_likes_at_snapshot` and `hf_downloads_at_snapshot` as non-negative integers.
-- [ ] Validate `snapshot_timestamp_utc` as UTC `Z`-suffix timestamp.
-- [ ] Validate `ranking_signal` enum (`likes|downloads|hybrid`).
-- [ ] Validate `selection_method` enum (`manual_hf_top_scan_v1`).
-- [ ] Implement canonical `model_id` normalization.
-- [ ] Implement strict eligibility checks and canonical reason-code mapping.
-- [ ] Emit deterministic manifest JSON files under `manifests/<model_id>/`.
-- [ ] Add/execute tests for at least one eligible and one ineligible path.
-- [ ] Update handoff docs after implementation outcomes.
+- Treat eligibility failures as expected outcomes, not crashes (exit code 0).
+- `data/models.csv` is human-owned — read-only in code.
+- Legacy CSV columns (`ranking_signal`, `selection_method`, `eligible`, `selection_source`) in header → reject with exit code 2.
+- Run `pytest` after every code change (per `AGENTS.md` testing policy).
+- Create Makefile/scripts for repeated commands (per `AGENTS.md` automation policy).
 
 ## Acceptance criteria (definition of done)
 
-- Script runs from shared conda env and processes `data/models.csv` end-to-end.
-- Invalid or legacy CSV header shapes fail with explicit input-contract error.
+- Script runs from conda env and processes `data/models.csv` end-to-end.
+- Invalid or legacy CSV header shapes fail with explicit input-contract error (exit 2).
 - Manifest outputs conform to v1 schema and enum contracts.
-- At least one successful and one failed eligibility path are represented in output metadata.
+- At least one eligible and one ineligible path represented in output or test fixtures.
 - Output files are deterministic and reproducible for same inputs.
-- Handoff docs are updated with outcomes and next M2 OSV-scan task.
+- All tests pass (`make test`).
+- Handoff docs updated with outcomes; `NEXT_TASK.md` points to Phase 2.
 
 ## Verification checklist
 
-- [ ] `python scripts/ingest_repo_artifacts.py --help` works.
-- [ ] Running script against `data/models.csv` produces `manifests/<model_id>/manifest_index.json` outputs.
-- [ ] Legacy-header fixture with old columns fails with explicit schema error.
-- [ ] Bad numeric fixture (`hf_likes_at_snapshot` or `hf_downloads_at_snapshot`) fails validation.
-- [ ] Bad enum fixture (`ranking_signal` or `selection_method`) fails validation.
-- [ ] Bad timestamp fixture (`snapshot_timestamp_utc`) fails validation.
-- [ ] `rg -n "eligible|reason|repo_commit_sha|source_repo_url" manifests`
-- [ ] `rg -n "schema_version|reason_code|generated_at_utc" manifests`
-- [ ] No unresolved placeholder text remains in new script/docs.
+- [ ] `python scripts/ingest_repo_artifacts.py --help` works
+- [ ] `make test` passes
+- [ ] `make ingest` produces `manifests/<model_id>/manifest_index.json` for each CSV row
+- [ ] Legacy-header fixture fails with exit code 2
+- [ ] Bad timestamp fixture fails validation
+- [ ] Bad numeric fixture fails validation
+- [ ] Manifest JSON files validate against schema (stable keys, trailing newline, Z-suffix timestamps)
+- [ ] No unresolved placeholder text in new code/docs
 
 ## Risks / rollback notes
 
-- GitHub/API variability may affect repo metadata resolution; include clear fallback/unknown states.
-- Overly strict checks may reduce candidate count; this is acceptable for initial baseline.
-- If output schema drifts, update extraction spec and `_INDEX.md` references in the same change.
+- GitHub API variability may affect repo metadata resolution; include fallback/unknown states.
+- Overly strict checks may reduce eligible count; acceptable for initial baseline.
+- If output schema drifts, update `artifact-schemas.md` and `_INDEX.md` in the same change.

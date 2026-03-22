@@ -3,7 +3,7 @@
 ## Purpose
 Record resolved project policy defaults that were previously open decisions, plus change-control expectations.
 
-**Last updated:** 2026-03-02
+**Last updated:** 2026-03-21
 
 ## Decision Entries
 
@@ -19,7 +19,7 @@ Record resolved project policy defaults that were previously open decisions, plu
 - Impact:
   - agents validate and consume rows; they do not auto-populate `data/models.csv`.
   - each CSV row represents a final selected candidate for ingestion.
-  - dependency artifact types and eligibility are runtime-derived, not manual CSV fields.
+  - eligibility is runtime-derived; dependency artifact hints are optionally human-curated (see DEC-008).
 
 ### DEC-002: Target sample size (v1)
 
@@ -90,6 +90,28 @@ Record resolved project policy defaults that were previously open decisions, plu
   - minimizes runtime/storage overhead and reduces nondeterministic repo-side effects.
 - Impact:
   - README and specs must describe one artifact flow for v1.
+
+### DEC-008: CSV schema reconciliation (v1)
+
+- Status: Accepted
+- Effective date: 2026-03-21
+- Decision:
+  - Removed `ranking_signal`, `selection_method`, `eligible`, and `selection_source` columns from `data/models.csv`.
+  - Added `dependency_artifact` and `dependency_artifact_url` as optional human-curated hint columns.
+  - Kept `selection_rationale` as unique per-model provenance text.
+  - `hf_likes_at_snapshot` accepts human-readable shorthand (e.g., "2.59k") in CSV; normalized to integer during ingestion.
+- Rationale:
+  - `ranking_signal` was uniform across all rows (no variance, no signal).
+  - `selection_method` contained per-row narrative text describing the same manual process; not machine-actionable.
+  - `eligible` was uniformly "true" and should be runtime-derived per DEC-001.
+  - `selection_source` was the HF model page URL, trivially derivable from `hf_model_id`.
+  - Artifact hint columns reduce API calls during ingestion by giving the script a starting point.
+- Impact:
+  - CSV v1 schema is now 9 columns (5 required, 4 optional).
+  - Ingestion script must parse human-readable shorthand for likes/downloads.
+  - Ingestion script should use `dependency_artifact_url` as a hint when present.
+  - Updated specs: `data-sourcing-and-eligibility.md`, `artifact-schemas.md`.
+- Supersedes: partially revises DEC-001 (dependency artifacts are now optionally hinted in CSV, not strictly runtime-only).
 
 ## Change-Control Rules
 

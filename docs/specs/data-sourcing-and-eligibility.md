@@ -5,15 +5,17 @@ Define authoritative rules for sourcing model candidates and determining whether
 
 ## Inputs
 - Candidate model list from curated CSV (`data/models.csv`) in v1.
-- Minimum CSV columns:
+- Required CSV columns:
   - `hf_model_id`
   - `source_repo_url`
   - `snapshot_timestamp_utc`
-  - `hf_likes_at_snapshot`
-  - `hf_downloads_at_snapshot`
-  - `ranking_signal`
-  - `selection_method`
-  - `curation_notes` (optional)
+  - `hf_downloads_at_snapshot` (non-negative integer)
+  - `hf_likes_at_snapshot` (non-negative integer; human-readable shorthand like "2.59k" accepted, normalized during ingestion)
+- Optional CSV columns:
+  - `dependency_artifact` (human-curated hint for artifact filename/path)
+  - `dependency_artifact_url` (direct URL to the artifact in the source repo)
+  - `selection_rationale` (freeform text explaining why this model was selected)
+  - `curation_notes` (freeform operator notes)
 
 ## Authoritative Rules
 
@@ -23,8 +25,8 @@ Define authoritative rules for sourcing model candidates and determining whether
 - Each row in `data/models.csv` represents a final selected model candidate for ingestion.
 - `hf_model_id` and `source_repo_url` are required; rows missing either are invalid.
 - Candidate target size default is 15 models unless handoff docs explicitly override.
-- Dependency artifact details are not manually curated in CSV and must be discovered during ingestion.
-- `eligible` is a runtime-derived field recorded in output artifacts, not a CSV input field.
+- `dependency_artifact` and `dependency_artifact_url` are optional human-curated hints in the CSV. When present, the ingestion script uses them as a starting point but may discover additional artifacts at runtime.
+- Eligibility is determined at runtime and recorded in output artifacts.
 
 ### Eligibility Policy (Strict by Default)
 A candidate is eligible only if all checks pass:

@@ -1,75 +1,52 @@
 # Current Status
 
-**Last updated:** 2026-03-02  
-**Owner:** Joe + Codex
+**Last updated:** 2026-03-21
+**Owner:** Joe
 
 ## Current focus
 
-Documentation hardening for zero-context agent execution across milestones M1-M4.
+Phase 0 scaffolding complete. Project is ready for Phase 1 (M1 ingestion implementation).
 
 ## Completed in current focus
 
-- Applied `data/models.csv` schema cutover for human-curated selection metadata:
-  - removed ambiguous input columns (`selection_rationale`, `selection_source`, `snapshot_timestamp`, `eligible`)
-  - added canonical v1 selection columns (`snapshot_timestamp_utc`, likes/download counts, ranking signal, method, notes)
-  - clarified that dependency artifacts and eligibility are runtime-derived during ingestion.
-- Added end-to-end master checklist:
-  - `docs/handoff/PROJECT_CHECKLIST.md` with phase gates, dependencies, and acceptance criteria for M1-M4.
-- Added new authoritative specs:
-  - `docs/specs/artifact-schemas.md`
-  - `docs/specs/pipeline-execution-contract.md`
-  - `docs/specs/testing-and-validation.md`
-  - `docs/specs/decision-log.md`
-- Updated specs index routing:
-  - `docs/specs/_INDEX.md` now includes all active specs and read triggers.
-- Resolved policy defaults previously tracked as open decisions:
-  - manual curated candidate source (`data/models.csv`) for v1,
-  - default sample target of 15,
-  - unpinned dependencies map to `vuln_status=unknown`,
-  - ambiguous refs resolve to default-branch `HEAD` with provenance,
-  - `depends_on` edges deferred in v1,
-  - composite risk score out of scope in v1.
-- Updated existing specs to align with resolved defaults:
-  - `docs/specs/data-sourcing-and-eligibility.md`
-  - `docs/specs/extraction-and-normalization.md`
-  - `docs/specs/graph-semantics-and-metrics.md`
-  - `docs/specs/artifact-schemas.md` (revised `models.json` per-model metadata contract)
-- Updated operational docs for consistency:
-  - `README.md` now reflects the new `models.csv` schema and curation workflow.
-  - `docs/handoff/NEXT_TASK.md` now includes explicit schema/type/enum/timestamp validation requirements for M1 ingestion.
+- CSV/spec reconciliation (DEC-008):
+  - removed 4 low-value columns from `data/models.csv`: `ranking_signal`, `selection_method`, `eligible`, `selection_source`
+  - kept `selection_rationale` (unique per-model provenance)
+  - added `dependency_artifact` and `dependency_artifact_url` as official optional hint columns
+  - updated `data-sourcing-and-eligibility.md` and `artifact-schemas.md` to match
+  - recorded decision in `decision-log.md` as DEC-008
+- Agent scaffolding:
+  - created `docs/handoff/CAMPAIGN_PLAN.md` — phased roadmap (Phase 0–5)
+  - created `docs/handoff/TASK_QUEUE.md` — prioritized task backlog with 22 tasks across all phases
+  - created `docs/handoff/QUICK_REFERENCE.md` — single-page cheat sheet (CSV schema, enums, CLI contract, file layout)
+  - added Automation/Testing policies to `AGENTS.md`
+  - created `CLAUDE.md` for Claude Code orientation
 
 ## Passing checks
 
-- All new doc artifacts from the documentation hardening plan are present.
-- `docs/specs/_INDEX.md` includes routing entries for every active spec.
-- Core policy defaults are now explicit in `docs/specs/decision-log.md`.
-- Existing README/spec conflict on ingestion behavior is resolved to artifact-only v1 flow.
-- Cross-doc references for `models.csv` are updated to the hard-cutover schema.
+- `data/models.csv` has 9 columns matching spec (13 candidate rows)
+- All spec files consistent with CSV schema after DEC-008
+- `docs/specs/_INDEX.md` routes to all 7 active specs
+- Decision log has 8 accepted entries, all current
+- Campaign plan, task queue, and quick reference all present
 
 ## Known gaps/blockers
 
-- No ingestion script implementation exists yet.
-- No OSV scan, graph build, or reporting scripts exist yet.
-- `data/models.csv` still needs human-populated candidate rows using the new schema columns.
+- No implementation code exists yet (scripts/, tests/)
+- No Makefile exists yet
+- OSV-Scanner not yet verified in conda env
+- CSV has 13 candidates; target is 15 (2 more may be added later)
 
 ## Active coordination notes
 
-- Documentation baseline is now decision-complete for implementation.
-- Next implementation should follow M1 gate requirements from:
-  - `docs/handoff/PROJECT_CHECKLIST.md`
-  - `docs/specs/artifact-schemas.md`
-  - `docs/specs/pipeline-execution-contract.md`
+- Phase 1 tasks (T-007 through T-013) are all `queued` and ready
+- Next agent should start with T-007 (model_id normalization) or T-008 (CSV parser)
+- T-007 and T-008 have no interdependencies and can be worked in parallel
 
 ## Next task (single target)
 
-Implement `scripts/ingest_repo_artifacts.py` to produce deterministic per-model manifest outputs from `data/models.csv` using canonical schemas and reason codes.
+Begin Phase 1 M1 implementation. See `NEXT_TASK.md` for details and `TASK_QUEUE.md` for the full backlog.
 
 ## Definition of done for next task
 
-- Script exists and follows:
-  - `docs/specs/extraction-and-normalization.md`
-  - `docs/specs/artifact-schemas.md`
-  - `docs/specs/pipeline-execution-contract.md`
-- Script emits deterministic `manifests/<model_id>/manifest_index.json` outputs.
-- Eligibility pass/fail outcomes use canonical machine-readable reason codes.
-- `NEXT_TASK.md` is updated to point to subsequent M2 OSV-scan integration.
+See `NEXT_TASK.md` acceptance criteria and `TASK_QUEUE.md` per-task acceptance criteria.

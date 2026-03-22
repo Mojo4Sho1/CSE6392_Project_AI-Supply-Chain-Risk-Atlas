@@ -86,15 +86,19 @@ Rationale:
 - `snapshot_timestamp_utc` (timestamp)
 - `hf_likes_at_snapshot` (integer, `>=0`)
 - `hf_downloads_at_snapshot` (integer, `>=0`)
-- `ranking_signal` (enum: `likes` | `downloads` | `hybrid`)
-- `selection_method` (enum: `manual_hf_top_scan_v1`)
-- `curation_notes` (string, optional)
-- `eligible` (boolean, runtime-derived; not human-entered in CSV)
+- `eligible` (boolean, runtime-derived)
 - `repo_commit_sha` (string; SHA or `unknown`)
 - `dependency_artifacts_found` (array of strings; may be empty)
 
+### Optional per-model fields
+
+- `dependency_artifact` (string; human-curated hint for artifact path)
+- `dependency_artifact_url` (string; direct URL to artifact in source repo)
+- `selection_rationale` (string; freeform text explaining model selection)
+- `curation_notes` (string; operator notes)
+
 Validation rules:
-- `hf_likes_at_snapshot` and `hf_downloads_at_snapshot` must parse as non-negative integers.
+- `hf_likes_at_snapshot` and `hf_downloads_at_snapshot` must parse as non-negative integers. Human-readable shorthand (e.g., "2.59k", "7.54k") is accepted in CSV input and normalized to integer during ingestion.
 - `snapshot_timestamp_utc` must be UTC with `Z` suffix.
 
 ## Schema: `manifests/<model_id>/manifest_index.json`

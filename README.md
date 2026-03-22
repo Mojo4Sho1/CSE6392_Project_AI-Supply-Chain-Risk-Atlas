@@ -120,27 +120,30 @@ v1 policy defaults:
 - `data/models.csv` is human-owned input.
 - default sample target is 15 models.
 - automated model ranking is deferred.
-- dependency artifact/file-type data is discovered during ingestion, not entered manually in CSV.
+- `dependency_artifact` and `dependency_artifact_url` are optional human-curated hints; the ingestion script uses them as a starting point but may discover additional artifacts.
+- Eligibility is determined at runtime and recorded in output artifacts.
 
-For `data/models.csv`, required columns are:
+For `data/models.csv`, columns are:
 
 | Column | Type | Required | Allowed values / format | Meaning |
 |---|---|---|---|---|
-| `hf_model_id` | string | yes | non-empty | Hugging Face model ID (for example `org/model`) |
+| `hf_model_id` | string | yes | non-empty | Hugging Face model ID (e.g., `org/model`) |
 | `source_repo_url` | string | yes | public repo URL | Canonical source repository URL |
+| `dependency_artifact` | string | no | free text | Human hint: artifact filename/path |
+| `dependency_artifact_url` | string | no | URL | Direct URL to artifact in source repo |
 | `snapshot_timestamp_utc` | string | yes | `YYYY-MM-DDTHH:MM:SSZ` | Time the popularity metrics were captured |
-| `hf_likes_at_snapshot` | integer | yes | `>= 0` | Likes value at snapshot time |
 | `hf_downloads_at_snapshot` | integer | yes | `>= 0` | Downloads value at snapshot time |
-| `ranking_signal` | enum | yes | `likes`, `downloads`, `hybrid` | Primary signal used for inclusion |
-| `selection_method` | enum | yes | `manual_hf_top_scan_v1` | Controlled selection method label |
+| `hf_likes_at_snapshot` | integer | yes | `>= 0` (shorthand like "2.59k" accepted) | Likes value at snapshot time |
+| `selection_rationale` | string | no | free text | Why this model was selected |
 | `curation_notes` | string | no | free text | Optional operator notes |
 
 ### How To Curate `models.csv` Rows (v1)
 
 1. Find top candidate models on Hugging Face using likes/downloads.
 2. Keep only models with public source repositories.
-3. Enter one row per final selected candidate with snapshot metrics and selection metadata.
-4. Do not prefill dependency artifact types or eligibility outcomes; ingestion computes those.
+3. Verify the source repo has a recognizable dependency artifact (e.g., `requirements.txt`, `pyproject.toml`).
+4. Enter one row per final selected candidate with snapshot metrics and artifact hints.
+5. Eligibility is computed at runtime; do not add an `eligible` column.
 
 ---
 

@@ -67,6 +67,17 @@ Updates should be concrete, testable, and time-stamped.
 - Every spec must be listed in `docs/specs/_INDEX.md` with summary, tags, and read triggers.
 - `NEXT_TASK.md` should reference spec file paths directly whenever possible.
 
+## Automation and Token Efficiency
+- When a task involves repeated commands (build, test, lint, scan, etc.), create a `Makefile`, shell script, or equivalent task runner so future agents can invoke it in one command instead of re-discovering the steps.
+- Place reusable shell scripts in `scripts/` alongside pipeline scripts. Keep them minimal and idempotent.
+- Be token-conscious: use targeted file reads, spec routing via `_INDEX.md`, and scripted workflows to avoid redundant context loading.
+
+## Testing Policy
+- Write unit tests and smoke tests for all new code. Place tests in `tests/` mirroring the source structure.
+- After creating or modifying any code, run the full test suite (`pytest` from repo root) before considering the task complete. Do not skip this step.
+- If a test fails, fix the issue before moving on. Do not leave the test suite in a broken state.
+- See `docs/specs/testing-and-validation.md` for coverage requirements and milestone validation gates.
+
 ## Quality Bar
 - Prefer reproducibility and explicit assumptions.
 - Record decisions that affect outputs, schemas, or evaluation metrics.
