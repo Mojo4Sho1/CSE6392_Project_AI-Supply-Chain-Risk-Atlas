@@ -1,6 +1,6 @@
 # Next Task
 
-**Last updated:** 2026-03-21
+**Last updated:** 2026-03-23
 **Owner:** Joe
 
 ## Task summary
@@ -92,6 +92,23 @@ Tasks T-007 and T-008 have no interdependencies and can be started in parallel:
 - [ ] Bad numeric fixture fails validation
 - [ ] Manifest JSON files validate against schema (stable keys, trailing newline, Z-suffix timestamps)
 - [ ] No unresolved placeholder text in new code/docs
+
+## Mandatory final subtask: Update handoff documentation
+
+**This subtask must be completed last, after all code is written and all tests pass.**
+
+Using `docs/handoff/NEXT_TASK_TEMPLATE.md` as a guide, update the following before closing this batch:
+
+- [ ] Mark T-007 through T-013 as `done` in `docs/handoff/TASK_QUEUE.md`
+- [ ] Tick completed checkboxes in `docs/handoff/CAMPAIGN_PLAN.md` Phase 1
+- [ ] Rewrite `docs/handoff/CURRENT_STATUS.md`:
+  - what was completed (concrete, verifiable)
+  - checks run and their outcomes
+  - any remaining blockers or caveats
+- [ ] Rewrite `docs/handoff/NEXT_TASK.md` to brief the next agent on Phase 2 (M2 OSV scan), following `NEXT_TASK_TEMPLATE.md`
+- [ ] If any spec changed during this batch, update `docs/specs/_INDEX.md`
+
+The next `NEXT_TASK.md` must itself include this same "Mandatory final subtask" section so the pattern propagates to every future agent.
 
 ## Risks / rollback notes
 

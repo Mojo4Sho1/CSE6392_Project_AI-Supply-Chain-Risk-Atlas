@@ -1,6 +1,6 @@
 # Campaign Plan
 
-**Last updated:** 2026-03-21
+**Last updated:** 2026-03-23
 **Owner:** Joe
 
 ## Purpose
@@ -24,13 +24,13 @@ Phased implementation roadmap for the AI Supply Chain Risk Atlas pipeline. Agent
 
 **Goal:** Produce deterministic `manifest_index.json` for every CSV candidate.
 
-- Implement `model_id` normalization utility + tests
-- Implement CSV parser with v1 schema validation + tests
-- Implement artifact discovery with hint support + tests
-- Implement eligibility evaluation with canonical reason codes + tests
-- Assemble `scripts/ingest_repo_artifacts.py` with CLI contract
-- Create `Makefile` with `make ingest` and `make test` targets
-- End-to-end M1 smoke test
+- [ ] Implement `model_id` normalization utility + tests (T-007)
+- [ ] Implement CSV parser with v1 schema validation + tests (T-008)
+- [ ] Implement artifact discovery with hint support + tests (T-009)
+- [ ] Implement eligibility evaluation with canonical reason codes + tests (T-010)
+- [ ] Assemble `scripts/ingest_repo_artifacts.py` with CLI contract (T-011)
+- [ ] Create `Makefile` with `make ingest` and `make test` targets (T-012)
+- [ ] End-to-end M1 smoke test (T-013)
 
 **Gate:** `manifests/<model_id>/manifest_index.json` produced for all 13 CSV rows. At least one eligible + one ineligible path. All tests pass.
 
@@ -40,10 +40,9 @@ Phased implementation roadmap for the AI Supply Chain Risk Atlas pipeline. Agent
 
 **Goal:** Generate raw + normalized vulnerability data for eligible models.
 
-- Install/verify OSV-Scanner availability
-- Implement `scripts/run_osv_scan.py` + tests
-- Add `make scan` target
-- Normalize to `osv/<model_id>/normalized.json` schema
+- [ ] Install/verify OSV-Scanner availability (T-014)
+- [ ] Implement `scripts/run_osv_scan.py` + tests (T-015)
+- [ ] Add `make scan` target (T-016)
 
 **Gate:** Every eligible model has `raw.json` + `normalized.json`. All normalized files validate against schema. Scanner provenance recorded.
 
@@ -53,9 +52,8 @@ Phased implementation roadmap for the AI Supply Chain Risk Atlas pipeline. Agent
 
 **Goal:** Build the global typed atlas graph.
 
-- Implement `scripts/build_risk_graph.py` + tests
-- Add `make graph` target
-- Validate graph integrity (node attrs, edge endpoints, deduplication)
+- [ ] Implement `scripts/build_risk_graph.py` + tests (T-017)
+- [ ] Add `make graph` target (T-018)
 
 **Gate:** `graphs/global.graphml` loads cleanly. Package deduplication matches normalized inputs. No `depends_on` edges required.
 
@@ -65,9 +63,8 @@ Phased implementation roadmap for the AI Supply Chain Risk Atlas pipeline. Agent
 
 **Goal:** Produce baseline metrics, rankings, and visualizations.
 
-- Implement `scripts/generate_atlas_reports.py` + tests
-- Add `make report` and `make all` targets
-- Generate `reports/summary.json`, `reports/summary.csv`, `figures/`
+- [ ] Implement `scripts/generate_atlas_reports.py` + tests (T-019)
+- [ ] Add `make report` and `make all` targets (T-020)
 
 **Gate:** Report outputs validate against schema. Rankings reproducible. No composite risk score.
 
@@ -77,7 +74,9 @@ Phased implementation roadmap for the AI Supply Chain Risk Atlas pipeline. Agent
 
 **Goal:** End-to-end validation and final documentation.
 
-- Full pipeline run: `make all`
-- Cross-phase verification suite (see `PROJECT_CHECKLIST.md`)
-- Final documentation pass
-- Ensure all handoff docs reflect final state
+- [ ] Full pipeline run: `make all` (T-021)
+- [ ] Cross-phase verification suite (see `PROJECT_CHECKLIST.md`) (T-021)
+- [ ] Final documentation pass (T-022)
+- [ ] Ensure all handoff docs reflect final state (T-022)
+
+**Gate:** All milestone gates pass. All docs current. Pipeline reproducible end-to-end.
