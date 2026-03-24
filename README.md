@@ -43,7 +43,7 @@ This project builds a **typed dependency graph** over a small sample of **popula
 1. **Model selection**
    - Use human-curated rows in `data/models.csv` (v1 default)
    - Validate candidate rows against strict eligibility policy
-   - Freeze the dataset into a snapshot manifest
+   - Freeze per-model intake and provenance into `manifests/<model_id>/manifest_index.json`
 
 2. **Repo ingestion**
    - Fetch dependency artifacts only (artifact-only mode)
@@ -74,8 +74,7 @@ This repo is expected to produce and/or store the following artifacts:
 
 ```
 data/
-  models.csv                   # curated candidate list (early-phase source of truth)
-  models.json                  # frozen dataset manifest (HF models + repo links)
+  models.csv                   # curated candidate list and v1 authoritative input
 manifests/
   <model_id>/manifest_index.json
 osv/
@@ -102,19 +101,15 @@ docs/
 
 ---
 
-## Dataset Manifest
+## Dataset Input and Freeze Boundary
 
-The dataset is frozen into a single file:
-
-- `data/models.json`
-
-Early project phases may begin with a curated CSV:
-
-- `data/models.csv`
-
-In v1, `data/models.csv` is a human-curated input file containing final selected candidates only.
+In the implemented v1 pipeline, `data/models.csv` is the human-curated authoritative input file containing final selected candidates only.
 
 This makes analysis reproducible even if model popularity or repository state changes over time.
+
+The reproducible freeze boundary is the per-model manifest set written to:
+
+- `manifests/<model_id>/manifest_index.json`
 
 v1 policy defaults:
 - `data/models.csv` is human-owned input.
@@ -152,11 +147,14 @@ For `data/models.csv`, columns are:
 This repository is set up for agent-to-agent handoff and selective spec loading:
 
 1. Read `AGENTS.md`
-2. Read `docs/handoff/CURRENT_STATUS.md`
-3. Read `docs/handoff/NEXT_TASK.md`
-4. Read `docs/handoff/PROJECT_CHECKLIST.md`
-5. Read `docs/specs/_INDEX.md`
-6. Read only relevant spec files for the active task
+2. Read `docs/handoff/QUICK_REFERENCE.md`
+3. Read `docs/handoff/CURRENT_STATUS.md`
+4. Read `docs/handoff/NEXT_TASK.md`
+5. Read `docs/handoff/TASK_QUEUE.md`
+6. Read `docs/handoff/CAMPAIGN_PLAN.md`
+7. Read `docs/handoff/PROJECT_CHECKLIST.md`
+8. Read `docs/specs/_INDEX.md`
+9. Read only relevant spec files for the active task
 
 ## Authoritative Contracts
 
@@ -186,6 +184,25 @@ osv-scanner --version
 ```
 
 `environment.yml` manages the Python environment only; OSV-Scanner is expected to be available on your shell `PATH`.
+
+## Running the Pipeline
+
+From the repository root:
+
+```bash
+make ingest
+make scan
+make graph
+make report
+make all
+make validate
+```
+
+Command notes:
+
+- `make all` executes the full M1-M4 stage chain through reporting and may reuse already-generated stage outputs.
+- `make validate` runs the Phase 5 local validation bundle: CLI smoke checks, `make all`, `make test`, artifact existence checks, and the unresolved-decision grep from `docs/specs/testing-and-validation.md`.
+- Use `make clean` before `make all` only when you intentionally want to regenerate all pipeline outputs from scratch.
 
 ---
 
@@ -278,23 +295,20 @@ This policy should remain consistent across all models in the dataset.
 
 ## Milestones
 
-### M1 — Project scoping & model selection
-- Finalize 10–20 models with public repos and scannable dependency artifacts (v1 target 15)
-- Generate `data/models.json` with snapshot metadata
+### M1 — Ingestion & eligibility
+- Parse and validate `data/models.csv`
+- Generate `manifests/<model_id>/manifest_index.json`
 
 ### M2 — Dependency + vulnerability extraction
-- Run OSV scanning across all selected model artifact sets
-- Normalize outputs into a stable schema (`osv/<model_id>/normalized.json`)
+- Run OSV scanning across eligible model artifact sets
+- Normalize outputs into `osv/<model_id>/normalized.json`
 
 ### M3 — Graph construction & validation
 - Build typed graph (`graphs/global.graphml`)
-- Validate:
-  - consistent deduplication of packages
-  - all edges reference existing nodes
-  - per-model package counts align with normalized extraction outputs
+- Validate package deduplication and edge integrity
 
 ### M4 — Evaluation, visualization, and reporting
-- Compute all metrics and rankings
+- Compute the required baseline metrics and rankings
 - Generate final figures / atlas visuals
 - Produce `reports/summary.(json|csv)`
 

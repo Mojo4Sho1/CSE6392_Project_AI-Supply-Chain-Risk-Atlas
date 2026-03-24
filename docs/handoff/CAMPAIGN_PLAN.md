@@ -74,11 +74,11 @@ Phased implementation roadmap for the AI Supply Chain Risk Atlas pipeline. Agent
 
 **Goal:** End-to-end validation, final documentation, and a local showcase dashboard for demo use.
 
-- [ ] Full pipeline run: `make all` (T-021)
-- [ ] Cross-phase verification suite (see `PROJECT_CHECKLIST.md`) (T-021)
-- [ ] Final documentation pass (T-022)
-- [ ] Ensure all handoff docs reflect final state (T-022)
-- [ ] Draft dashboard showcase spec and route docs (T-023)
+- [x] Full pipeline run: `make all` (T-021)
+- [x] Cross-phase verification suite (see `PROJECT_CHECKLIST.md`) (T-021)
+- [x] Final documentation pass (T-022)
+- [x] Ensure all handoff docs reflect final state (T-022)
+- [x] Draft dashboard showcase spec and route docs (T-023)
 - [ ] Implement local Dash/Plotly dashboard + tests (T-024)
 - [ ] Add `make dashboard` target and demo instructions (T-025)
 

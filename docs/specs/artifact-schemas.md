@@ -67,40 +67,6 @@ Rationale:
 - readable path,
 - deterministic collision resistance.
 
-## Schema: `data/models.json`
-
-### Required top-level fields
-
-- `schema_version` (string, must be `1.0`)
-- `snapshot_timestamp_utc` (timestamp)
-- `selection_policy` (string; v1 default `manual_curated_csv_v1`)
-- `target_sample_size` (integer; v1 default `15`)
-- `source_csv` (string; expected `data/models.csv`)
-- `models` (array)
-
-### Required per-model fields
-
-- `hf_model_id` (string)
-- `model_id` (string)
-- `source_repo_url` (string)
-- `snapshot_timestamp_utc` (timestamp)
-- `hf_likes_at_snapshot` (integer, `>=0`)
-- `hf_downloads_at_snapshot` (integer, `>=0`)
-- `eligible` (boolean, runtime-derived)
-- `repo_commit_sha` (string; SHA or `unknown`)
-- `dependency_artifacts_found` (array of strings; may be empty)
-
-### Optional per-model fields
-
-- `dependency_artifact` (string; human-curated hint for artifact path)
-- `dependency_artifact_url` (string; direct URL to artifact in source repo)
-- `selection_rationale` (string; freeform text explaining model selection)
-- `curation_notes` (string; operator notes)
-
-Validation rules:
-- `hf_likes_at_snapshot` and `hf_downloads_at_snapshot` must parse as non-negative integers. Human-readable shorthand (e.g., "2.59k", "7.54k") is accepted in CSV input and normalized to integer during ingestion.
-- `snapshot_timestamp_utc` must be UTC with `Z` suffix.
-
 ## Schema: `manifests/<model_id>/manifest_index.json`
 
 ### Required top-level fields

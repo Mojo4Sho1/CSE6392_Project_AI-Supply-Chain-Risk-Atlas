@@ -7,12 +7,28 @@ OSV_STAMP      := osv/.stage_complete
 GRAPH_FILE     := graphs/global.graphml
 REPORT_STAMP   := reports/.stage_complete
 
-.PHONY: test ingest scan graph report all clean
+.PHONY: test ingest scan graph report all validate clean
 
 test:
 	$(PYTHON) -m pytest -q
 
 all: report
+
+validate:
+	$(PYTHON) scripts/ingest_repo_artifacts.py --help >/dev/null
+	$(PYTHON) scripts/run_osv_scan.py --help >/dev/null
+	$(PYTHON) scripts/build_risk_graph.py --help >/dev/null
+	$(PYTHON) scripts/generate_atlas_reports.py --help >/dev/null
+	$(MAKE) all
+	$(MAKE) test
+	test -f graphs/global.graphml
+	test -f reports/summary.json
+	test -f reports/summary.csv
+	test -f figures/reused_vulnerable_packages.png
+	test -f figures/impacted_model_count_distribution.png
+	find manifests -mindepth 2 -maxdepth 2 -name manifest_index.json | grep -q .
+	find osv -mindepth 2 -maxdepth 2 -name normalized.json | grep -q .
+	if rg -n "OPEN_DECISION" docs/specs README.md docs/handoff --glob '!docs/specs/testing-and-validation.md'; then exit 1; fi
 
 ingest: $(MANIFEST_STAMP)
 

@@ -33,9 +33,9 @@ Purpose: route agents to only the specification documents needed for the current
 - `read-when`: tasks involve graph construction, edge rules, deduplication identity, or reporting metrics.
 
 - `path`: `docs/specs/artifact-schemas.md`
-- `summary`: normative schema contracts, enums, `models.csv`-aligned selection metadata fields, timestamp rules, and deterministic `model_id` normalization.
+- `summary`: normative schema contracts for pipeline artifacts, canonical enums, timestamp rules, and deterministic `model_id` normalization.
 - `tags`: `schema`, `contracts`, `manifest`, `osv`, `reports`
-- `read-when`: tasks produce or consume `models.json`, `manifest_index.json`, normalized OSV outputs, or report summaries.
+- `read-when`: tasks produce or consume `manifest_index.json`, normalized OSV outputs, report summaries, or need canonical enums and `model_id` normalization rules.
 
 - `path`: `docs/specs/pipeline-execution-contract.md`
 - `summary`: canonical script boundaries, shared CLI contract, exit codes, retry policy, idempotency, and determinism requirements.

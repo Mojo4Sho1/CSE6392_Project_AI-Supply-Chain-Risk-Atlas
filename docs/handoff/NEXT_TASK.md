@@ -5,15 +5,15 @@
 
 ## Task summary
 
-Complete the Phase 5 validation/documentation batch: run the cross-phase verification suite against the now-complete M1-M4 pipeline, then reconcile README/handoff/spec references so the repository is submission-ready and internally consistent.
+Implement the optional local dashboard showcase described in `docs/specs/dashboard-showcase.md`, then add the launch target and demo instructions so the repo has a polished local presentation layer over the completed M1-M4 artifacts.
 
-**Task queue references:** T-021 through T-022 (see `docs/handoff/TASK_QUEUE.md`)
+**Task queue references:** T-024 through T-025 (see `docs/handoff/TASK_QUEUE.md`)
 
 ## Why this task is next
 
-- Phase 4 is complete: `reports/summary.json`, `reports/summary.csv`, and the required figures now exist and `make all` completes successfully.
-- The remaining core project gap is Phase 5 validation and documentation: confirm milestone gates/cross-phase checks, then align README and handoff docs with the final pipeline state.
-- The dashboard showcase remains a separate post-validation track and should not delay this batch.
+- Phase 5 validation/documentation is complete: the M1-M4 pipeline is validated, `README.md`/handoff/spec docs are aligned, and `make validate` now bundles the local verification workflow.
+- `docs/specs/dashboard-showcase.md` already defines the showcase contract, so the next batch can move straight into implementation.
+- The dashboard is explicitly optional for the core pipeline, which makes it a clean final batch without reopening the validated M1-M4 contracts.
 
 Long-horizon reference:
 - `docs/handoff/CAMPAIGN_PLAN.md` (phased roadmap)
@@ -21,75 +21,64 @@ Long-horizon reference:
 
 ## Recommended task order
 
-1. **T-021:** Run the Phase 5 validation pass and record exact outcomes against `PROJECT_CHECKLIST.md`
-2. **T-022:** Reconcile README/handoff/spec references and remove stale project-state language
-3. Re-run the final verification commands after any documentation/code adjustments
+1. **T-024:** Implement `scripts/run_dashboard.py` and any supporting loader/transform helpers needed to read `graphs/global.graphml`, `reports/summary.json`, and `reports/summary.csv`
+2. **T-024:** Add automated tests for artifact loading, dashboard-ready transformations, and core search/filter/detail behavior
+3. **T-025:** Add `make dashboard`, document the launch flow, and re-run the validation/test suite
 
 ## Scope (in)
 
-- Run the explicit Phase 5 validation checks for the completed M1-M4 pipeline and capture results in docs:
-  - milestone gates in `docs/handoff/PROJECT_CHECKLIST.md`
-  - cross-phase verification suite items that can be checked locally now
-  - documentation consistency checks from `docs/specs/testing-and-validation.md`
-- Perform the final documentation pass:
-  - README accuracy
-  - handoff docs current and mutually consistent
-  - spec references and task references not stale
-- Make any small corrective edits required to satisfy validation or documentation consistency findings
-- Write tests for any code changed during this batch (per `AGENTS.md` testing policy)
-- Create or extend `Makefile` targets for repeated commands if the validation batch reveals another repeated workflow
+- Implement the local read-only Dash/Plotly showcase contract from `docs/specs/dashboard-showcase.md`
+- Load the graph/report artifacts once at startup and transform them into dashboard-ready in-memory structures
+- Deliver the required overview, graph explorer, model detail, and package detail surfaces
+- Support the required searches, filters, and selection-driven detail panel behavior
+- Add unit and smoke tests for new dashboard code (per `AGENTS.md` testing policy)
+- Add `make dashboard` and README demo instructions for the local launch workflow
 
 ## Scope (out)
 
-- Dashboard implementation; that work is tracked separately in `T-023` through `T-025`
-- New report metrics or schema changes unless the validation pass finds a genuine contract gap
-- Broad feature expansion beyond validation, cleanup, and documentation readiness
+- Changes to the validated M1-M4 pipeline outputs or schemas unless the dashboard work uncovers a genuine contract bug
+- Hosted deployment, authentication, write-back workflows, or triggering pipeline stages from the dashboard
+- New graph edge types or composite risk-scoring work
 
 ## Dependencies / prerequisites
 
 - Quick orientation: `docs/handoff/QUICK_REFERENCE.md`
 - Environment: `environment.yml`, `AGENTS.md`
 - Inputs from prior phase:
-  - `manifests/<model_id>/manifest_index.json`
-  - `osv/<model_id>/normalized.json`
   - `graphs/global.graphml`
   - `reports/summary.json`
   - `reports/summary.csv`
   - `figures/reused_vulnerable_packages.png`
   - `figures/impacted_model_count_distribution.png`
 - Specs (read only what's needed):
-  - `docs/specs/testing-and-validation.md` — required validation/documentation consistency checks and milestone gates
-  - `docs/specs/pipeline-execution-contract.md` — end-to-end CLI/runtime expectations for the full pipeline
-  - `docs/specs/artifact-schemas.md` — output boundary contracts when cross-checking artifacts
-  - `docs/specs/decision-log.md` — confirm docs still reflect locked v1 defaults
+  - `docs/specs/dashboard-showcase.md` — dashboard runtime contract, required views, interactions, and tests
+  - `docs/specs/graph-semantics-and-metrics.md` — graph typing and node/edge attribute expectations
+  - `docs/specs/artifact-schemas.md` — report schema and enum contracts
+  - `docs/specs/testing-and-validation.md` — required test layers and validation expectations for new code
 
 ## Implementation notes
 
-- The current verified local baseline is:
-  - `make test` -> **114 passed**
-  - `make report` -> rewrites Phase 4 outputs successfully
-  - `make all` -> completes successfully
-- `make all` now reuses the stage chain and may short-circuit on existing outputs; if you intentionally need a full regeneration, use `make clean` first
-- Keep documentation concrete and time-stamped; when referencing current artifact baselines, prefer exact counts already verified in `CURRENT_STATUS.md`
-- If the validation pass uncovers a contract gap, update the relevant spec before changing behavior
+- Keep the dashboard strictly read-only over the existing artifacts; it must not ingest, scan, rebuild the graph, or regenerate reports
+- Treat `graphs/global.graphml` as the source of truth for topology and `reports/summary.json` / `reports/summary.csv` as the source of truth for precomputed metrics
+- Parse `vuln_ids_json` from GraphML package nodes as described in `docs/specs/dashboard-showcase.md`
 - Run `pytest` / `make test` after every code change
 - Treat expected failure paths as normal outcomes, not crashes
 
 ## Acceptance criteria (definition of done)
 
-- The Phase 5 validation results are recorded concretely in handoff/project docs
-- README and handoff/spec references are current and consistent with the implemented M1-M4 pipeline
-- Any issues found during validation are either fixed in this batch or documented as explicit blockers/caveats
+- The dashboard loads the existing graph/report artifacts locally and exposes the required overview, explorer, and detail surfaces
+- Search, filter, and selection behavior works as specified in `docs/specs/dashboard-showcase.md`
+- `make dashboard` launches the app with the documented defaults
 - All tests pass (`make test`)
 - Handoff docs updated (see mandatory final subtask below)
 
 ## Verification checklist
 
-- [ ] `make all` passes
+- [ ] `python scripts/run_dashboard.py --help` works
 - [ ] `make test` passes
-- [ ] Phase 5 milestone/checklist state is updated in `docs/handoff/PROJECT_CHECKLIST.md`
-- [ ] Documentation consistency checks pass (`rg -n "OPEN_DECISION" docs/specs README.md docs/handoff --glob '!docs/specs/testing-and-validation.md'`)
-- [ ] README accurately describes the completed pipeline outputs and execution path
+- [ ] `make dashboard` launches with the documented defaults
+- [ ] Dashboard startup reads `graphs/global.graphml`, `reports/summary.json`, and `reports/summary.csv` successfully
+- [ ] Required search/filter/detail interactions are covered by automated tests
 - [ ] No unresolved placeholder text in new code/docs
 
 ## Mandatory final subtask: Update handoff documentation
@@ -98,20 +87,20 @@ Long-horizon reference:
 
 Using `docs/handoff/NEXT_TASK_TEMPLATE.md` as a guide, update the following before closing this batch:
 
-- [ ] Mark T-021 through T-022 as `done` in `docs/handoff/TASK_QUEUE.md`
+- [ ] Mark T-024 through T-025 as `done` in `docs/handoff/TASK_QUEUE.md`
 - [ ] Tick completed checkboxes in `docs/handoff/CAMPAIGN_PLAN.md` Phase 5
-- [ ] Update `docs/handoff/PROJECT_CHECKLIST.md` if this batch changed milestone checklist state, acceptance gates, or cross-phase verification readiness
+- [ ] Update `docs/handoff/PROJECT_CHECKLIST.md` if this batch changed milestone checklist state or showcase-track readiness
 - [ ] Rewrite `docs/handoff/CURRENT_STATUS.md`:
   - what was completed (concrete, verifiable)
   - checks run and their outcomes
   - any remaining blockers or caveats
-- [ ] Rewrite `docs/handoff/NEXT_TASK.md` to brief the next agent on the next queued batch after validation/docs, following `NEXT_TASK_TEMPLATE.md`
+- [ ] Rewrite `docs/handoff/NEXT_TASK.md` to brief the next agent on the next queued batch after dashboard implementation, following `NEXT_TASK_TEMPLATE.md`
 - [ ] If any spec changed during this batch, update `docs/specs/_INDEX.md`
 
 The next `NEXT_TASK.md` must itself include this same "Mandatory final subtask" section so the pattern propagates to every future agent.
 
 ## Risks / rollback notes
 
-- Validation work can uncover stale README/spec references that look minor but change project interpretation; reconcile them carefully against the decision log
-- Because `make all` can now reuse existing artifacts, use `make clean` before claiming a full regeneration from scratch
-- Keep the dashboard showcase track deferred until the validation/docs batch is truly complete
+- Keep the dashboard separate from the validated pipeline stages; avoid adding any code path that mutates existing artifacts
+- Graph rendering can get visually noisy with the full atlas; keep filtering/search central so the local demo remains usable
+- Do not let dashboard convenience code introduce new schema assumptions that contradict `graphs/global.graphml` or `reports/summary.json`
