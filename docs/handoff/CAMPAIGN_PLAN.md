@@ -63,8 +63,8 @@ Phased implementation roadmap for the AI Supply Chain Risk Atlas pipeline. Agent
 
 **Goal:** Produce baseline metrics, rankings, and visualizations.
 
-- [ ] Implement `scripts/generate_atlas_reports.py` + tests (T-019)
-- [ ] Add `make report` and `make all` targets (T-020)
+- [x] Implement `scripts/generate_atlas_reports.py` + tests (T-019)
+- [x] Add `make report` and `make all` targets (T-020)
 
 **Gate:** Report outputs validate against schema. Rankings reproducible. No composite risk score.
 

@@ -5,53 +5,58 @@
 
 ## Current focus
 
-Phase 3 is complete. The project is ready to start Phase 4 reporting from `graphs/global.graphml`.
+Phase 4 is complete. The project is ready for Phase 5 validation and final documentation.
 
 ## Completed in current focus
 
-- Implemented all Phase 3 tasks (T-017 through T-018):
-  - `scripts/build_risk_graph.py` — M3 CLI pipeline that loads `osv/<model_id>/normalized.json`, builds the global typed graph, validates required node/edge attributes, and writes `graphs/global.graphml`
-  - `scripts/_utils/graph_build.py` — normalized-input loading, package-node deduplication, deterministic `uses_package` depth mapping, graph integrity checks, GraphML-safe `vuln_ids_json` encoding, and conservative package-annotation merging for duplicate package keys across models
-  - `tests/unit/test_graph_build.py` — unit coverage for package deduplication, conservative vulnerability-annotation merge behavior, and depth validation
-  - `tests/integration/test_build_risk_graph.py` — integration coverage for CLI help, GraphML output generation, package deduplication, and zero-package model preservation
-  - `Makefile` — added `make graph`
-- Generated live Phase 3 output for the current corpus:
-  - `graphs/global.graphml` produced from all 13 normalized OSV outputs
-  - graph contains **13 Model nodes**, **276 Package nodes**, and **322 `uses_package` edges**
-  - zero-package model `stabilityai--stable-diffusion-xl-base-1.0--5eb3438c` is present with out-degree 0
-- Clarified graph contract documentation:
-  - `docs/specs/graph-semantics-and-metrics.md` now defines `node_type` / `edge_type`, the v1 depth rule (`direct=0`, `transitive=1`, `unknown=-1`), GraphML-safe `vuln_ids_json`, and deterministic duplicate-package merge behavior
-  - `docs/specs/_INDEX.md` updated to reflect the expanded graph serialization/merge rules
+- Implemented all Phase 4 tasks (T-019 through T-020):
+  - `scripts/generate_atlas_reports.py` — M4 CLI pipeline that loads `graphs/global.graphml`, validates the typed graph, computes the required baseline metrics, and writes report artifacts under `reports/` and `figures/`
+  - `scripts/_utils/report_build.py` — GraphML loading, `vuln_ids_json` parsing, deterministic metric computation, stable CSV serialization, and reproducible PNG figure generation with atomic writes
+  - `tests/unit/test_report_build.py` — unit coverage for aggregate/per-model metrics and reused-vulnerable-package ordering rules
+  - `tests/integration/test_generate_atlas_reports.py` — integration coverage for CLI help, summary JSON/CSV generation, figure generation, and bad-input exit code handling
+  - `Makefile` — added `make report` and `make all`, and wired the stage chain so later runs can reuse existing stage outputs
+- Generated live Phase 4 output for the current corpus:
+  - `reports/summary.json`
+  - `reports/summary.csv`
+  - `figures/reused_vulnerable_packages.png`
+  - `figures/impacted_model_count_distribution.png`
+- Current live report baseline from `graphs/global.graphml`:
+  - **13 models** in `per_model_metrics`
+  - **276 unique packages**
+  - average packages per model: **24.76923076923077**
+  - average direct packages per model: **10.692307692307692**
+  - average transitive packages per model: **14.076923076923077**
+  - **21** `reused_vulnerable_packages` entries in the current summary output
 
 ## Passing checks
 
-- `python scripts/build_risk_graph.py --help`: **exits 0**
-- `make graph`: **completed successfully** and wrote `graphs/global.graphml`
-- `make test`: **110 tests passed, 0 failures**
+- `python scripts/generate_atlas_reports.py --help`: **exits 0**
+- `make test`: **114 tests passed, 0 failures**
+- `make report`: **completed successfully** and wrote all required Phase 4 outputs
+- `make all`: **completed successfully**
 - Output contract verification:
-  - **13 normalized inputs** consumed
-  - graph counts match normalized inputs exactly: **13 models**, **276 unique packages**, **322 uses-package edges**
-  - zero-package model preserved with **0 outgoing edges**
+  - `reports/summary.json` contains the required top-level fields: `schema_version`, `generated_at_utc`, `snapshot_timestamp_utc`, `graph_source`, `global_metrics`, `per_model_metrics`, `reused_vulnerable_packages`
+  - `reports/summary.csv` contains **13** data rows and the required six columns in the correct order
+  - both required PNG figures exist under `figures/`
 
 ## Known gaps/blockers
 
-- Phase 4 remains open: `scripts/generate_atlas_reports.py`, report tests, `make report`, and `make all`
-- No report artifacts exist yet under `reports/` or `figures/`
-- Reporting must parse package-node `vuln_ids_json` because GraphML stores scalar attributes only
-- Dashboard work is now queued as a post-M4 local showcase track; no dashboard code exists yet
+- Phase 5 remains open: full cross-phase verification against `PROJECT_CHECKLIST.md` and the final documentation pass
+- `make all` is now wired, but the final validation batch still needs to explicitly execute the cross-phase verification suite and document outcomes
+- Dashboard work remains queued as a post-submission local showcase track; no dashboard code exists yet
 
 ## Active coordination notes
 
-- T-017 and T-018 are complete and verified locally
-- `graphs/global.graphml` is now the authoritative input boundary for Phase 4
-- The next agent should start with T-019 (`generate_atlas_reports.py`) and then T-020 (`make report` / `make all`)
-- The Phase 4 brief now explicitly calls out `summary.csv` columns, report ordering rules, minimum figure outputs, and the current graph-size sanity baseline to reduce implementation ambiguity
-- Added a new queued dashboard showcase track (`T-023` through `T-025`) using Dash + Plotly, but it remains explicitly deferred until after M4
-- `PROJECT_CHECKLIST.md` milestone state did not change in this batch; the dashboard is tracked as a Phase 5 showcase extension rather than a new M1-M4 gate
+- T-019 and T-020 are complete and verified locally
+- `graphs/global.graphml` remains the authoritative input boundary for reporting; `reports/summary.json` is now the authoritative Phase 4 summary artifact
+- The report stage reads `snapshot_timestamp_utc` from the graph artifact and writes deterministic ordering for `per_model_metrics`, `summary.csv`, and `reused_vulnerable_packages`
+- The next agent should start with T-021 (cross-phase validation) and T-022 (final documentation/README consistency)
+- `PROJECT_CHECKLIST.md` M4 state changed in this batch and is now marked complete
+- The dashboard showcase track (`T-023` through `T-025`) remains explicitly deferred until after the validation/docs batch
 
 ## Next task (single target)
 
-Implement Phase 4 M4 reporting from `graphs/global.graphml`. See `NEXT_TASK.md` for details and `TASK_QUEUE.md` for the full backlog.
+Execute the Phase 5 validation/documentation batch. See `NEXT_TASK.md` for details and `TASK_QUEUE.md` for the full backlog.
 
 ## Definition of done for next task
 

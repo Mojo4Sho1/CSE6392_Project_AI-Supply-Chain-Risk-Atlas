@@ -61,14 +61,14 @@ Prioritized backlog of discrete, agent-executable tasks. After completing assign
 
 | ID | Status | Task | Specs to Read | Acceptance Criteria |
 |----|--------|------|---------------|---------------------|
-| T-019 | active | Implement `generate_atlas_reports.py` + tests | `graph-semantics-and-metrics.md`, `artifact-schemas.md`, `pipeline-execution-contract.md` | `summary.json` + `summary.csv` + `figures/` produced; schema-valid |
-| T-020 | queued | Add `make report` and `make all` targets | — | `make all` runs full pipeline end-to-end |
+| T-019 | done | Implement `generate_atlas_reports.py` + tests | `graph-semantics-and-metrics.md`, `artifact-schemas.md`, `pipeline-execution-contract.md` | `summary.json` + `summary.csv` + `figures/` produced; schema-valid |
+| T-020 | done | Add `make report` and `make all` targets | — | `make all` runs full pipeline end-to-end |
 
 ## Phase 5: Polish, Submission & Showcase
 
 | ID | Status | Task | Specs to Read | Acceptance Criteria |
 |----|--------|------|---------------|---------------------|
-| T-021 | queued | Full pipeline validation (`make all`) | `PROJECT_CHECKLIST.md` | All milestone gates pass; cross-phase verification suite passes |
+| T-021 | active | Full pipeline validation (`make all`) | `PROJECT_CHECKLIST.md` | All milestone gates pass; cross-phase verification suite passes |
 | T-022 | queued | Final documentation pass | All handoff + spec docs | All docs current; no stale references; README accurate |
 | T-023 | queued | Draft dashboard showcase spec and route docs | `dashboard-showcase.md`, `_INDEX.md` | Dashboard spec exists; routing docs point future agents to it consistently |
 | T-024 | queued | Implement local Dash/Plotly dashboard + tests | `dashboard-showcase.md`, `graph-semantics-and-metrics.md`, `artifact-schemas.md` | Local dashboard loads graph/report artifacts, supports required search/filters/details, and test coverage exists |

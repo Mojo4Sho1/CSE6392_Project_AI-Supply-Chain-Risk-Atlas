@@ -139,14 +139,14 @@ Produce baseline metrics/rankings and final report artifacts from the graph.
 - `figures/` visual outputs
 
 **Checklist**
-- [ ] Compute baseline dependency, vulnerability, and risk-structure metrics.
-- [ ] Emit per-model and aggregate metrics with stable ordering.
-- [ ] Generate reproducible figures from the same graph input.
+- [x] Compute baseline dependency, vulnerability, and risk-structure metrics.
+- [x] Emit per-model and aggregate metrics with stable ordering.
+- [x] Generate reproducible figures from the same graph input.
 
 **Acceptance gate**
-- [ ] Report outputs validate against schema contracts.
-- [ ] Rankings are reproducible for identical inputs.
-- [ ] Composite risk score is absent unless the decision log is explicitly revised.
+- [x] Report outputs validate against schema contracts.
+- [x] Rankings are reproducible for identical inputs.
+- [x] Composite risk score is absent unless the decision log is explicitly revised.
 
 ## Cross-Phase Verification Suite
 
