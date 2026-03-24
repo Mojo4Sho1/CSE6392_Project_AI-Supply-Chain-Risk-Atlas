@@ -1,0 +1,2 @@
+hf_model_id,source_repo_url,dependency_artifact,dependency_artifact_url,snapshot_timestamp_utc,hf_downloads_at_snapshot,hf_likes_at_snapshot,selection_rationale,curation_notes
+google-bert/bert-base-uncased,https://github.com/google-research/bert,requirements.txt (root),https://github.com/google-research/bert/blob/master/requirements.txt,not-a-timestamp,72509778,2590,Test model,Test

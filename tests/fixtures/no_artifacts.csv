@@ -1,0 +1,2 @@
+hf_model_id,source_repo_url,dependency_artifact,dependency_artifact_url,snapshot_timestamp_utc,hf_downloads_at_snapshot,hf_likes_at_snapshot,selection_rationale,curation_notes
+no-artifacts/test-model,https://github.com/no-artifacts/test-model,,,2026-03-20T18:33:20Z,1000,10,Model with no artifacts,Test

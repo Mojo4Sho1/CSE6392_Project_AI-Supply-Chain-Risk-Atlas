@@ -1,0 +1,19 @@
+# Python caches
+__pycache__/
+*.py[cod]
+
+# Test/tool caches
+.pytest_cache/
+.coverage
+
+# Local editor/agent state
+.claude/
+.vscode/
+.DS_Store
+
+# Generated pipeline outputs
+manifests/
+osv/
+graphs/
+reports/
+figures/
