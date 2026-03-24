@@ -178,6 +178,15 @@ conda env create -f environment.yml
 conda activate ai-supply-chain-risk-atlas
 ```
 
+Install OSV-Scanner separately as an external prerequisite on macOS:
+
+```bash
+brew install osv-scanner
+osv-scanner --version
+```
+
+`environment.yml` manages the Python environment only; OSV-Scanner is expected to be available on your shell `PATH`.
+
 ---
 
 ## Graph Schema

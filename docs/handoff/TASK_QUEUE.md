@@ -1,6 +1,6 @@
 # Task Queue
 
-**Last updated:** 2026-03-21
+**Last updated:** 2026-03-24
 **Owner:** Joe
 
 ## Purpose
@@ -34,20 +34,20 @@ Prioritized backlog of discrete, agent-executable tasks. After completing assign
 
 | ID | Status | Task | Specs to Read | Acceptance Criteria |
 |----|--------|------|---------------|---------------------|
-| T-007 | queued | Implement `model_id` normalization utility + tests | `artifact-schemas.md` (normalization section) | Function passes deterministic test cases; output matches spec 7-step algorithm |
-| T-008 | queued | Implement CSV parser with v1 schema validation + tests | `data-sourcing-and-eligibility.md`, `artifact-schemas.md` | Validates 9-column header; parses shorthand likes; rejects legacy schemas |
-| T-009 | queued | Implement artifact discovery with hint support + tests | `data-sourcing-and-eligibility.md`, `extraction-and-normalization.md` | Uses `dependency_artifact_url` hint when present; discovers artifacts otherwise; handles unreachable repos |
-| T-010 | queued | Implement eligibility evaluation + tests | `data-sourcing-and-eligibility.md`, `artifact-schemas.md` | All canonical `eligibility_reason_code` values mapped; at least one eligible + one ineligible test case |
-| T-011 | queued | Assemble `ingest_repo_artifacts.py` with CLI contract | `pipeline-execution-contract.md` | `--help` works; CLI flags match contract; exit codes correct |
-| T-012 | queued | Create Makefile with `ingest`/`test` targets | `AGENTS.md` (automation section) | `make test` runs pytest; `make ingest` runs ingestion script |
-| T-013 | queued | End-to-end M1 smoke test | `testing-and-validation.md` | Script processes all 13 CSV rows; manifests validate against schema |
+| T-007 | done | Implement `model_id` normalization utility + tests | `artifact-schemas.md` (normalization section) | Function passes deterministic test cases; output matches spec 7-step algorithm |
+| T-008 | done | Implement CSV parser with v1 schema validation + tests | `data-sourcing-and-eligibility.md`, `artifact-schemas.md` | Validates 9-column header; parses shorthand likes; rejects legacy schemas |
+| T-009 | done | Implement artifact discovery with hint support + tests | `data-sourcing-and-eligibility.md`, `extraction-and-normalization.md` | Uses `dependency_artifact_url` hint when present; discovers artifacts otherwise; handles unreachable repos |
+| T-010 | done | Implement eligibility evaluation + tests | `data-sourcing-and-eligibility.md`, `artifact-schemas.md` | All canonical `eligibility_reason_code` values mapped; at least one eligible + one ineligible test case |
+| T-011 | done | Assemble `ingest_repo_artifacts.py` with CLI contract | `pipeline-execution-contract.md` | `--help` works; CLI flags match contract; exit codes correct |
+| T-012 | done | Create Makefile with `ingest`/`test` targets | `AGENTS.md` (automation section) | `make test` runs pytest; `make ingest` runs ingestion script |
+| T-013 | done | End-to-end M1 smoke test | `testing-and-validation.md` | Script processes all 13 CSV rows; manifests validate against schema |
 
 ## Phase 2: M2 — OSV Scan & Normalization
 
 | ID | Status | Task | Specs to Read | Acceptance Criteria |
 |----|--------|------|---------------|---------------------|
-| T-014 | queued | Install/verify OSV-Scanner | `extraction-and-normalization.md` | `osv-scanner --version` works in conda env |
-| T-015 | queued | Implement `run_osv_scan.py` + tests | `extraction-and-normalization.md`, `artifact-schemas.md`, `pipeline-execution-contract.md` | Raw + normalized JSON for all eligible models; schema-valid |
+| T-014 | done | Install/verify OSV-Scanner | `extraction-and-normalization.md` | `osv-scanner --version` works in conda env |
+| T-015 | active | Implement `run_osv_scan.py` + tests | `extraction-and-normalization.md`, `artifact-schemas.md`, `pipeline-execution-contract.md` | Raw + normalized JSON for all eligible models; schema-valid |
 | T-016 | queued | Add `make scan` target | — | `make scan` runs OSV scan script |
 
 ## Phase 3: M3 — Graph Construction

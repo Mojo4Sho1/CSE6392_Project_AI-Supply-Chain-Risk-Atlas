@@ -1,51 +1,56 @@
 # Current Status
 
-**Last updated:** 2026-03-21
+**Last updated:** 2026-03-24
 **Owner:** Joe
 
 ## Current focus
 
-Phase 0 scaffolding complete. Project is ready for Phase 1 (M1 ingestion implementation).
+Phase 2 setup is partially complete. M1 is complete and the project is ready to implement M2 OSV scanning.
 
 ## Completed in current focus
 
-- CSV/spec reconciliation (DEC-008):
-  - removed 4 low-value columns from `data/models.csv`: `ranking_signal`, `selection_method`, `eligible`, `selection_source`
-  - kept `selection_rationale` (unique per-model provenance)
-  - added `dependency_artifact` and `dependency_artifact_url` as official optional hint columns
-  - updated `data-sourcing-and-eligibility.md` and `artifact-schemas.md` to match
-  - recorded decision in `decision-log.md` as DEC-008
-- Agent scaffolding:
-  - created `docs/handoff/CAMPAIGN_PLAN.md` — phased roadmap (Phase 0–5)
-  - created `docs/handoff/TASK_QUEUE.md` — prioritized task backlog with 22 tasks across all phases
-  - created `docs/handoff/QUICK_REFERENCE.md` — single-page cheat sheet (CSV schema, enums, CLI contract, file layout)
-  - added Automation/Testing policies to `AGENTS.md`
-  - created `CLAUDE.md` for Claude Code orientation
+- Implemented all Phase 1 tasks (T-007 through T-013):
+  - `scripts/_utils/model_id.py` — 7-step deterministic `model_id` normalization with SHA-1 hash suffix; sentinel-based algorithm preserves `--` separator through hyphen-collapse step
+  - `scripts/_utils/csv_parser.py` — strict v1 schema validation; shorthand likes parsing (`2.59k` → 2590); legacy column rejection (exit 2); all required/optional columns handled
+  - `scripts/_utils/artifact_discovery.py` — GitHub raw content fetching with hint URL strategy; fallback probing for 9 recognized artifacts; retry with backoff; blob→raw URL conversion; parse-validity checks (TOML, JSON, UTF-8)
+  - `scripts/_utils/eligibility.py` — all 10 canonical `eligibility_reason_code` values mapped; error_code-first evaluation order
+  - `scripts/_utils/json_utils.py` — atomic writes, stable key ordering, UTC timestamps, trailing newline
+  - `scripts/ingest_repo_artifacts.py` — full CLI contract (`--input`, `--output-root`, `--snapshot-timestamp`, `--dry-run`, `--log-level`); exit codes 0/2/4; per-candidate logging
+  - `Makefile` — `make test` and `make ingest` targets
+  - `tests/unit/` — 82 unit tests across model_id, csv_parser, artifact_discovery, eligibility
+  - `tests/integration/test_ingest.py` — 9 integration tests covering eligible/ineligible/dry-run/determinism/no-artifacts paths
+  - `tests/fixtures/` — 5 fixture CSVs for all required negative paths
+  - conda env created: `ai-supply-chain-risk-atlas` (Python 3.11)
+- Verified T-014 prerequisite:
+  - OSV-Scanner installed successfully via Homebrew on macOS
+  - `osv-scanner --version` works from within the activated `ai-supply-chain-risk-atlas` conda environment
+  - repo setup guidance should treat OSV-Scanner as an external prerequisite on `PATH`, not a package managed by `environment.yml`
 
 ## Passing checks
 
-- `data/models.csv` has 9 columns matching spec (13 candidate rows)
-- All spec files consistent with CSV schema after DEC-008
-- `docs/specs/_INDEX.md` routes to all 7 active specs
-- Decision log has 8 accepted entries, all current
-- Campaign plan, task queue, and quick reference all present
+- `make test` (pytest -q): **91 tests passed, 0 failures**
+- `python scripts/ingest_repo_artifacts.py --help`: exits 0, all flags shown
+- Legacy header fixture: exits 2 with descriptive error message
+- End-to-end ingest on `data/models.csv`: **13/13 eligible**, all manifests written to `manifests/`
+- All 13 manifest files validated: correct `schema_version`, `generated_at_utc` with Z suffix, trailing newline, stable key ordering
+- `conda env create -f environment.yml`: environment created successfully
+- `osv-scanner --version`: works inside the activated conda env after Homebrew install
 
 ## Known gaps/blockers
 
-- No implementation code exists yet (scripts/, tests/)
-- No Makefile exists yet
-- OSV-Scanner not yet verified in conda env
-- CSV has 13 candidates; target is 15 (2 more may be added later)
+- All 13 models are eligible in real data (no real ineligible case). Ineligible path is covered by mocked integration tests.
+- Makefile hardcodes conda env Python path — next agent may want to use `conda run` or `$(CONDA_PREFIX)/bin/python` for portability.
+- M2 implementation work remains open: `scripts/run_osv_scan.py`, normalization logic, tests, and `make scan`.
 
 ## Active coordination notes
 
-- Phase 1 tasks (T-007 through T-013) are all `queued` and ready
-- Next agent should start with T-007 (model_id normalization) or T-008 (CSV parser)
-- T-007 and T-008 have no interdependencies and can be worked in parallel
+- T-014 is complete and verified locally.
+- Next agent should start with T-015 (implement `run_osv_scan.py`) and T-016 (`make scan`).
+- M1 output (`manifests/<model_id>/manifest_index.json`) is now available as Phase 2 input.
 
 ## Next task (single target)
 
-Begin Phase 1 M1 implementation. See `NEXT_TASK.md` for details and `TASK_QUEUE.md` for the full backlog.
+Implement Phase 2 M2 scanning and normalization. See `NEXT_TASK.md` for details and `TASK_QUEUE.md` for the full backlog.
 
 ## Definition of done for next task
 

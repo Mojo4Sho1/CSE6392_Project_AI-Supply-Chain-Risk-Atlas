@@ -1,6 +1,6 @@
 # Campaign Plan
 
-**Last updated:** 2026-03-23
+**Last updated:** 2026-03-24
 **Owner:** Joe
 
 ## Purpose
@@ -24,13 +24,13 @@ Phased implementation roadmap for the AI Supply Chain Risk Atlas pipeline. Agent
 
 **Goal:** Produce deterministic `manifest_index.json` for every CSV candidate.
 
-- [ ] Implement `model_id` normalization utility + tests (T-007)
-- [ ] Implement CSV parser with v1 schema validation + tests (T-008)
-- [ ] Implement artifact discovery with hint support + tests (T-009)
-- [ ] Implement eligibility evaluation with canonical reason codes + tests (T-010)
-- [ ] Assemble `scripts/ingest_repo_artifacts.py` with CLI contract (T-011)
-- [ ] Create `Makefile` with `make ingest` and `make test` targets (T-012)
-- [ ] End-to-end M1 smoke test (T-013)
+- [x] Implement `model_id` normalization utility + tests (T-007)
+- [x] Implement CSV parser with v1 schema validation + tests (T-008)
+- [x] Implement artifact discovery with hint support + tests (T-009)
+- [x] Implement eligibility evaluation with canonical reason codes + tests (T-010)
+- [x] Assemble `scripts/ingest_repo_artifacts.py` with CLI contract (T-011)
+- [x] Create `Makefile` with `make ingest` and `make test` targets (T-012)
+- [x] End-to-end M1 smoke test (T-013)
 
 **Gate:** `manifests/<model_id>/manifest_index.json` produced for all 13 CSV rows. At least one eligible + one ineligible path. All tests pass.
 
@@ -40,7 +40,7 @@ Phased implementation roadmap for the AI Supply Chain Risk Atlas pipeline. Agent
 
 **Goal:** Generate raw + normalized vulnerability data for eligible models.
 
-- [ ] Install/verify OSV-Scanner availability (T-014)
+- [x] Install/verify OSV-Scanner availability (T-014)
 - [ ] Implement `scripts/run_osv_scan.py` + tests (T-015)
 - [ ] Add `make scan` target (T-016)
 
