@@ -222,6 +222,32 @@ Rules:
 - `impacted_model_count` (integer)
 - `vuln_ids` (array of strings)
 
+Ordering rules:
+
+- `per_model_metrics` must be sorted by `hf_model_id` ascending, then `model_id` ascending
+- `reused_vulnerable_packages` must be sorted by:
+  1. `impacted_model_count` descending
+  2. `ecosystem` ascending
+  3. `name` ascending
+  4. `version` ascending with `null` sorted before non-null strings
+
+## Schema: `reports/summary.csv`
+
+### Required columns
+
+- `hf_model_id`
+- `model_id`
+- `vulnerable_direct_dependencies`
+- `vulnerable_transitive_dependencies`
+- `vulnerable_packages_per_model`
+- `unique_vuln_ids_per_model`
+
+Rules:
+
+- one row per model
+- rows must appear in the same deterministic order as `summary.json.per_model_metrics`
+- column order must match the list above
+
 ## Schema Evolution Rules
 
 - Backward-incompatible changes must increment major schema version.

@@ -40,6 +40,7 @@ Long-horizon reference:
 - Keep report ordering deterministic and define stable tie-breaks in code/tests
 - Write unit tests and smoke tests for all new code (per `AGENTS.md` testing policy)
 - Create or extend `Makefile` targets for repeated commands (per `AGENTS.md` automation policy)
+- Keep the implementation decision-complete with the clarified report contract below; do not invent additional metrics unless the specs are updated in the same batch
 
 ## Scope (out)
 
@@ -65,6 +66,16 @@ Long-horizon reference:
 
 - Package-node vulnerability IDs are stored in GraphML as `vuln_ids_json`; reporting must parse that field back into a list before computing unique-vulnerability metrics
 - Model nodes include `model_id`, `hf_model_id`, and `snapshot_timestamp_utc`; do not derive per-model identity from opaque GraphML node IDs
+- `reports/summary.csv` should mirror `summary.json.per_model_metrics` exactly, with one row per model and these columns in order:
+  - `hf_model_id`
+  - `model_id`
+  - `vulnerable_direct_dependencies`
+  - `vulnerable_transitive_dependencies`
+  - `vulnerable_packages_per_model`
+  - `unique_vuln_ids_per_model`
+- Deterministic ordering rules:
+  - `per_model_metrics` / `summary.csv` rows sorted by `hf_model_id`, then `model_id`
+  - `reused_vulnerable_packages` sorted by `impacted_model_count` descending, then `ecosystem`, `name`, `version`
 - Baseline metrics only:
   - unique package count
   - average packages per model
@@ -75,7 +86,13 @@ Long-horizon reference:
   - vulnerable packages per model
   - unique vulnerability IDs per model
   - reused vulnerable packages / impacted-model counts
+- Minimum acceptable v1 figure set:
+  - `figures/reused_vulnerable_packages.png` — ranked bar chart of the top reused vulnerable packages
+  - `figures/impacted_model_count_distribution.png` — distribution of impacted-model counts per vulnerable package
+- `make report` should call `scripts/generate_atlas_reports.py` against `graphs/global.graphml`
 - `make all` should reuse the existing stage targets so one `make` invocation carries a single shared `TIMESTAMP`
+- Current Phase 4 input sanity baseline for the repo:
+  - `graphs/global.graphml` currently contains 13 model nodes, 276 package nodes, and 322 `uses_package` edges
 - Run `pytest` / `make test` after every code change
 - Treat expected failure paths as normal outcomes, not crashes
 
@@ -85,7 +102,7 @@ Long-horizon reference:
 - `make report` runs the reporting script
 - `make all` runs the full pipeline end-to-end
 - `reports/summary.json` and `reports/summary.csv` are produced and contain the required baseline metrics
-- `figures/` contains reproducible report figure output(s)
+- `figures/` contains at least the two expected reproducible PNG outputs
 - All tests pass (`make test`)
 - Handoff docs updated (see mandatory final subtask below)
 
@@ -96,7 +113,8 @@ Long-horizon reference:
 - [ ] `make all` completes without error
 - [ ] `reports/summary.json` exists and contains the required top-level fields
 - [ ] `reports/summary.csv` exists and includes one row per model
-- [ ] `figures/` contains reproducible output(s)
+- [ ] `figures/reused_vulnerable_packages.png` exists
+- [ ] `figures/impacted_model_count_distribution.png` exists
 - [ ] `make test` passes
 - [ ] No unresolved placeholder text in new code/docs
 
