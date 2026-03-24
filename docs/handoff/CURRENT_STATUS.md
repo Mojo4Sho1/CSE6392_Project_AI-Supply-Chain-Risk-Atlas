@@ -5,52 +5,50 @@
 
 ## Current focus
 
-Phase 2 setup is partially complete. M1 is complete and the project is ready to implement M2 OSV scanning.
+Phase 2 is complete. The project is ready to start Phase 3 graph construction from the normalized OSV outputs in `osv/`.
 
 ## Completed in current focus
 
-- Implemented all Phase 1 tasks (T-007 through T-013):
-  - `scripts/_utils/model_id.py` — 7-step deterministic `model_id` normalization with SHA-1 hash suffix; sentinel-based algorithm preserves `--` separator through hyphen-collapse step
-  - `scripts/_utils/csv_parser.py` — strict v1 schema validation; shorthand likes parsing (`2.59k` → 2590); legacy column rejection (exit 2); all required/optional columns handled
-  - `scripts/_utils/artifact_discovery.py` — GitHub raw content fetching with hint URL strategy; fallback probing for 9 recognized artifacts; retry with backoff; blob→raw URL conversion; parse-validity checks (TOML, JSON, UTF-8)
-  - `scripts/_utils/eligibility.py` — all 10 canonical `eligibility_reason_code` values mapped; error_code-first evaluation order
-  - `scripts/_utils/json_utils.py` — atomic writes, stable key ordering, UTC timestamps, trailing newline
-  - `scripts/ingest_repo_artifacts.py` — full CLI contract (`--input`, `--output-root`, `--snapshot-timestamp`, `--dry-run`, `--log-level`); exit codes 0/2/4; per-candidate logging
-  - `Makefile` — `make test` and `make ingest` targets
-  - `tests/unit/` — 82 unit tests across model_id, csv_parser, artifact_discovery, eligibility
-  - `tests/integration/test_ingest.py` — 9 integration tests covering eligible/ineligible/dry-run/determinism/no-artifacts paths
-  - `tests/fixtures/` — 5 fixture CSVs for all required negative paths
-  - conda env created: `ai-supply-chain-risk-atlas` (Python 3.11)
-- Verified T-014 prerequisite:
-  - OSV-Scanner installed successfully via Homebrew on macOS
-  - `osv-scanner --version` works from within the activated `ai-supply-chain-risk-atlas` conda environment
-  - repo setup guidance should treat OSV-Scanner as an external prerequisite on `PATH`, not a package managed by `environment.yml`
+- Implemented all Phase 2 tasks (T-015 through T-016):
+  - `scripts/run_osv_scan.py` — M2 CLI pipeline that loads eligible manifests, re-fetches artifacts, runs `osv-scanner`, writes `osv/<model_id>/raw.json`, and normalizes to `osv/<model_id>/normalized.json`
+  - `scripts/_utils/osv_scan.py` — direct-dependency parsing, scanner version parsing, vulnerability/status normalization, severity bucketing, and deterministic package merging
+  - `Makefile` — added `make scan`
+  - `tests/unit/test_osv_scan.py` — unit coverage for requirements/pyproject/package.json parsing, scanner version parsing, and normalized output rules
+  - `tests/integration/test_run_osv_scan.py` — integration coverage for eligible/ineligible/dry-run/bad-manifest/missing-scanner paths, synthetic `pyproject.toml` handling, and empty-package outputs
+- Generated live Phase 2 outputs for the current corpus:
+  - `osv/*/raw.json` and `osv/*/normalized.json` produced for all 13 manifest directories
+  - scanner provenance recorded as `osv-scanner` version `2.3.5` in every normalized file
+  - 322 normalized package records emitted across the 13 models
+  - 21 normalized package records currently have `vuln_status="vulnerable"`
+- Handled two real-data M2 edge cases:
+  - `pyproject.toml` artifacts are converted to temporary synthetic `requirements.txt` inputs because `osv-scanner 2.3.5` does not directly scan `pyproject.toml`
+  - `stabilityai/stable-diffusion-xl-base-1.0` produces an empty normalized package list because the recorded `pyproject.toml` declares no scanable package dependencies
 
 ## Passing checks
 
-- `make test` (pytest -q): **91 tests passed, 0 failures**
-- `python scripts/ingest_repo_artifacts.py --help`: exits 0, all flags shown
-- Legacy header fixture: exits 2 with descriptive error message
-- End-to-end ingest on `data/models.csv`: **13/13 eligible**, all manifests written to `manifests/`
-- All 13 manifest files validated: correct `schema_version`, `generated_at_utc` with Z suffix, trailing newline, stable key ordering
-- `conda env create -f environment.yml`: environment created successfully
-- `osv-scanner --version`: works inside the activated conda env after Homebrew install
+- `make test`: **105 tests passed, 0 failures**
+- `python scripts/run_osv_scan.py --help`: exits 0, all common CLI flags shown
+- `make scan`: completed successfully against the live `manifests/` corpus
+- Output contract verification:
+  - **13 raw outputs** and **13 normalized outputs**
+  - every normalized file has `schema_version="1.0"`, `generated_at_utc` with `Z` suffix, and `scanner.name` / `scanner.version`
+  - normalized files are present for every eligible manifest
 
 ## Known gaps/blockers
 
-- All 13 models are eligible in real data (no real ineligible case). Ineligible path is covered by mocked integration tests.
-- Makefile hardcodes conda env Python path — next agent may want to use `conda run` or `$(CONDA_PREFIX)/bin/python` for portability.
-- M2 implementation work remains open: `scripts/run_osv_scan.py`, normalization logic, tests, and `make scan`.
+- Phase 3 remains open: `scripts/build_risk_graph.py`, graph tests, and `make graph`
+- Live M2 execution still depends on external network access plus `osv-scanner` being available on `PATH`
+- One model (`stabilityai/stable-diffusion-xl-base-1.0`) has zero normalized packages; the graph builder should still emit the model node with zero `uses_package` edges
 
 ## Active coordination notes
 
-- T-014 is complete and verified locally.
-- Next agent should start with T-015 (implement `run_osv_scan.py`) and T-016 (`make scan`).
-- M1 output (`manifests/<model_id>/manifest_index.json`) is now available as Phase 2 input.
+- T-015 and T-016 are complete and verified locally
+- `osv/` is now the authoritative input boundary for Phase 3
+- The next agent should start with T-017 (`build_risk_graph.py`) and then T-018 (`make graph`)
 
 ## Next task (single target)
 
-Implement Phase 2 M2 scanning and normalization. See `NEXT_TASK.md` for details and `TASK_QUEUE.md` for the full backlog.
+Implement Phase 3 M3 graph construction from `osv/<model_id>/normalized.json`. See `NEXT_TASK.md` for details and `TASK_QUEUE.md` for the full backlog.
 
 ## Definition of done for next task
 

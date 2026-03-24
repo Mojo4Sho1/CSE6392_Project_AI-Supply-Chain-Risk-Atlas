@@ -56,20 +56,20 @@ Build deterministic artifact-ingestion outputs from `data/models.csv` under stri
 - Optional run-level logs for diagnostics
 
 **Checklist**
-- [ ] Implement ingestion script contract.
-- [ ] Enforce required CSV fields and strict eligibility checks.
-- [ ] Validate CSV header as exact hard-cutover v1 schema.
-- [ ] Validate snapshot/metric/enum input constraints from schema spec.
-- [ ] Discover dependency artifacts at runtime from repository sources.
-- [ ] Emit canonical eligibility `reason_code` values.
-- [ ] Capture provenance (`source_repo_url`, resolved ref, commit SHA or unknown reason, evaluation timestamp).
-- [ ] Guarantee deterministic output formatting and ordering.
+- [x] Implement ingestion script contract.
+- [x] Enforce required CSV fields and strict eligibility checks.
+- [x] Validate CSV header as exact hard-cutover v1 schema.
+- [x] Validate snapshot/metric/enum input constraints from schema spec.
+- [x] Discover dependency artifacts at runtime from repository sources.
+- [x] Emit canonical eligibility `reason_code` values.
+- [x] Capture provenance (`source_repo_url`, resolved ref, commit SHA or unknown reason, evaluation timestamp).
+- [x] Guarantee deterministic output formatting and ordering.
 
 **Acceptance gate**
-- [ ] At least one eligible and one ineligible path represented in outputs (fixtures or real rows).
-- [ ] All manifest files validate against the v1 manifest schema.
-- [ ] No undocumented reason codes are emitted.
-- [ ] Legacy CSV schema variants fail with explicit input-contract errors.
+- [x] At least one eligible and one ineligible path represented in outputs (fixtures or real rows).
+- [x] All manifest files validate against the v1 manifest schema.
+- [x] No undocumented reason codes are emitted.
+- [x] Legacy CSV schema variants fail with explicit input-contract errors.
 
 ### M2: OSV Scan and Normalization
 
@@ -87,16 +87,16 @@ Generate raw OSV results and normalized vulnerability data for all eligible mode
 - `osv/<model_id>/normalized.json`
 
 **Checklist**
-- [ ] Scan only eligible candidates from M1 outputs.
-- [ ] Persist raw scanner output unchanged.
-- [ ] Normalize to schema version `1.0`.
-- [ ] Set `vuln_status=unknown` for unpinned versions.
-- [ ] Keep package identity invariant `(ecosystem, name, version)`.
+- [x] Scan only eligible candidates from M1 outputs.
+- [x] Persist raw scanner output unchanged when OSV-Scanner emits JSON; emit deterministic empty results when an eligible artifact declares no scanable packages.
+- [x] Normalize to schema version `1.0`.
+- [x] Set `vuln_status=unknown` for unpinned versions.
+- [x] Keep package identity invariant `(ecosystem, name, version)`.
 
 **Acceptance gate**
-- [ ] Every raw output has a paired normalized output.
-- [ ] Normalized files validate against schema and enum contracts.
-- [ ] Scanner name/version and provenance are present in each normalized file.
+- [x] Every raw output has a paired normalized output.
+- [x] Normalized files validate against schema and enum contracts.
+- [x] Scanner name/version and provenance are present in each normalized file.
 
 ### M3: Graph Build and Validation
 

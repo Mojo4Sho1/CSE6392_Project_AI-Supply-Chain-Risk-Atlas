@@ -47,14 +47,14 @@ Prioritized backlog of discrete, agent-executable tasks. After completing assign
 | ID | Status | Task | Specs to Read | Acceptance Criteria |
 |----|--------|------|---------------|---------------------|
 | T-014 | done | Install/verify OSV-Scanner | `extraction-and-normalization.md` | `osv-scanner --version` works in conda env |
-| T-015 | active | Implement `run_osv_scan.py` + tests | `extraction-and-normalization.md`, `artifact-schemas.md`, `pipeline-execution-contract.md` | Raw + normalized JSON for all eligible models; schema-valid |
-| T-016 | queued | Add `make scan` target | — | `make scan` runs OSV scan script |
+| T-015 | done | Implement `run_osv_scan.py` + tests | `extraction-and-normalization.md`, `artifact-schemas.md`, `pipeline-execution-contract.md` | Raw + normalized JSON for all eligible models; schema-valid |
+| T-016 | done | Add `make scan` target | — | `make scan` runs OSV scan script |
 
 ## Phase 3: M3 — Graph Construction
 
 | ID | Status | Task | Specs to Read | Acceptance Criteria |
 |----|--------|------|---------------|---------------------|
-| T-017 | queued | Implement `build_risk_graph.py` + tests | `graph-semantics-and-metrics.md`, `artifact-schemas.md`, `pipeline-execution-contract.md` | `global.graphml` loads; correct node/edge types; package deduplication verified |
+| T-017 | active | Implement `build_risk_graph.py` + tests | `graph-semantics-and-metrics.md`, `artifact-schemas.md`, `pipeline-execution-contract.md` | `global.graphml` loads; correct node/edge types; package deduplication verified |
 | T-018 | queued | Add `make graph` target | — | `make graph` runs graph build script |
 
 ## Phase 4: M4 — Reporting & Atlas

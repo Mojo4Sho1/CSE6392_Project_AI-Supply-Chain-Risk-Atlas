@@ -41,8 +41,8 @@ Phased implementation roadmap for the AI Supply Chain Risk Atlas pipeline. Agent
 **Goal:** Generate raw + normalized vulnerability data for eligible models.
 
 - [x] Install/verify OSV-Scanner availability (T-014)
-- [ ] Implement `scripts/run_osv_scan.py` + tests (T-015)
-- [ ] Add `make scan` target (T-016)
+- [x] Implement `scripts/run_osv_scan.py` + tests (T-015)
+- [x] Add `make scan` target (T-016)
 
 **Gate:** Every eligible model has `raw.json` + `normalized.json`. All normalized files validate against schema. Scanner provenance recorded.
 
