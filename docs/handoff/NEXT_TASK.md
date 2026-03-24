@@ -94,6 +94,7 @@ Using `docs/handoff/NEXT_TASK_TEMPLATE.md` as a guide, update the following befo
 
 - [ ] Mark T-015 through T-016 as `done` in `docs/handoff/TASK_QUEUE.md`
 - [ ] Tick completed checkboxes in `docs/handoff/CAMPAIGN_PLAN.md` Phase 2
+- [ ] Update `docs/handoff/PROJECT_CHECKLIST.md` if this batch changed milestone checklist state, acceptance gates, or cross-phase verification readiness
 - [ ] Rewrite `docs/handoff/CURRENT_STATUS.md`:
   - what was completed (concrete, verifiable)
   - checks run and their outcomes

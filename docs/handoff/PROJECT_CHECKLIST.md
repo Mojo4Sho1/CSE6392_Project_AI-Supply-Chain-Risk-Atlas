@@ -1,6 +1,6 @@
 # Project Checklist
 
-**Last updated:** 2026-03-02  
+**Last updated:** 2026-03-24  
 **Owner:** Joe + Codex
 
 ## Purpose
@@ -165,6 +165,7 @@ Produce baseline metrics/rankings and final report artifacts from the graph.
 
 ## Handoff Obligations Per Batch
 
+- Update `docs/handoff/PROJECT_CHECKLIST.md` when the completed batch changes milestone checklist status, acceptance-gate status, or cross-phase verification readiness.
 - Update `docs/handoff/CURRENT_STATUS.md` with:
   - concrete completed work,
   - checks run and outcomes,
@@ -173,6 +174,7 @@ Produce baseline metrics/rankings and final report artifacts from the graph.
   - one executable next batch,
   - explicit in-scope/out-of-scope,
   - acceptance criteria and verification steps.
+- If no checklist item changed in the batch, explicitly confirm that no `PROJECT_CHECKLIST.md` state changed before closing the task.
 - If specs changed:
   - update `docs/specs/_INDEX.md` in the same commit.
 

@@ -24,8 +24,9 @@ Agents must follow this order to minimize context pollution:
 4. `docs/handoff/NEXT_TASK.md`
 5. `docs/handoff/TASK_QUEUE.md` (prioritized backlog)
 6. `docs/handoff/CAMPAIGN_PLAN.md` (long-horizon context)
-7. `docs/specs/_INDEX.md`
-8. Only the spec file(s) relevant to active task(s)
+7. `docs/handoff/PROJECT_CHECKLIST.md` (milestone gates and cross-phase validation)
+8. `docs/specs/_INDEX.md`
+9. Only the spec file(s) relevant to active task(s)
 
 ## New Agent Bootstrap Checklist
 Use this checklist at the start of every new task batch:
@@ -43,6 +44,7 @@ Use this checklist at the start of every new task batch:
 4. Completion obligations
    - update `docs/handoff/CURRENT_STATUS.md`,
    - update `docs/handoff/NEXT_TASK.md`,
+   - update `docs/handoff/PROJECT_CHECKLIST.md` when milestone checklist state or acceptance gates changed,
    - if any spec changes, update `docs/specs/_INDEX.md` in the same batch.
 
 ## Spec Loading Policy
@@ -61,9 +63,10 @@ At completion of any task batch, agents must complete the "Mandatory final subta
 
 1. Mark completed tasks as `done` in `docs/handoff/TASK_QUEUE.md`
 2. Tick completed checkboxes in `docs/handoff/CAMPAIGN_PLAN.md`
-3. Rewrite `docs/handoff/CURRENT_STATUS.md` with concrete completed work, checks run, and any blockers
-4. Rewrite `docs/handoff/NEXT_TASK.md` for the next agent using `docs/handoff/NEXT_TASK_TEMPLATE.md`
-5. If any spec changed, update `docs/specs/_INDEX.md` in the same batch
+3. Update `docs/handoff/PROJECT_CHECKLIST.md` when the completed batch changes milestone checklist or gate status
+4. Rewrite `docs/handoff/CURRENT_STATUS.md` with concrete completed work, checks run, and any blockers
+5. Rewrite `docs/handoff/NEXT_TASK.md` for the next agent using `docs/handoff/NEXT_TASK_TEMPLATE.md`
+6. If any spec changed, update `docs/specs/_INDEX.md` in the same batch
 
 The new `NEXT_TASK.md` must itself include the "Mandatory final subtask" section so the pattern propagates.
 Updates should be concrete, testable, and time-stamped.
