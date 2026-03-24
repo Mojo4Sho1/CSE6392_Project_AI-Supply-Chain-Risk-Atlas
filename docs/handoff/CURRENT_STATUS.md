@@ -38,12 +38,15 @@ Phase 3 is complete. The project is ready to start Phase 4 reporting from `graph
 - Phase 4 remains open: `scripts/generate_atlas_reports.py`, report tests, `make report`, and `make all`
 - No report artifacts exist yet under `reports/` or `figures/`
 - Reporting must parse package-node `vuln_ids_json` because GraphML stores scalar attributes only
+- Dashboard work is now queued as a post-M4 local showcase track; no dashboard code exists yet
 
 ## Active coordination notes
 
 - T-017 and T-018 are complete and verified locally
 - `graphs/global.graphml` is now the authoritative input boundary for Phase 4
 - The next agent should start with T-019 (`generate_atlas_reports.py`) and then T-020 (`make report` / `make all`)
+- Added a new queued dashboard showcase track (`T-023` through `T-025`) using Dash + Plotly, but it remains explicitly deferred until after M4
+- `PROJECT_CHECKLIST.md` milestone state did not change in this batch; the dashboard is tracked as a Phase 5 showcase extension rather than a new M1-M4 gate
 
 ## Next task (single target)
 

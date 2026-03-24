@@ -13,6 +13,7 @@ Implement Phase 4 M4 reporting: build `scripts/generate_atlas_reports.py` so it 
 
 - Phase 3 is complete. `graphs/global.graphml` now exists and has been verified against the 13 normalized OSV inputs.
 - The next open milestone gap is converting the graph into the baseline atlas metrics and report artifacts required for project completion.
+- A separate local dashboard showcase track is now queued for post-M4 work; it should not delay the reporting batch.
 
 Long-horizon reference:
 - `docs/handoff/CAMPAIGN_PLAN.md` (phased roadmap)
@@ -45,6 +46,7 @@ Long-horizon reference:
 - Composite risk scoring
 - New graph edge types or graph schema changes unless a genuine spec gap is discovered
 - Re-running M1 through M3 except when needed to debug a report-input contract issue
+- Dashboard implementation; that work is tracked separately in `T-023` through `T-025`
 
 ## Dependencies / prerequisites
 

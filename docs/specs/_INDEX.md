@@ -52,6 +52,11 @@ Purpose: route agents to only the specification documents needed for the current
 - `tags`: `policy`, `defaults`, `governance`, `decisions`
 - `read-when`: any task depends on policy choices such as sample sizing, unpinned handling, or required graph edges.
 
+- `path`: `docs/specs/dashboard-showcase.md`
+- `summary`: local Dash + Plotly showcase dashboard contract, required inputs/views/interactions, and runtime defaults.
+- `tags`: `dashboard`, `showcase`, `ui`, `dash`, `plotly`
+- `read-when`: tasks involve the interactive local demo app, dashboard data loading, UI behavior, or `make dashboard`.
+
 When adding another spec, use this template:
 
 - `path`: `docs/specs/<filename>.md`
