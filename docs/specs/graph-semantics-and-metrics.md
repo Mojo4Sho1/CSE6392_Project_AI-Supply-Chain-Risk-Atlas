@@ -3,6 +3,8 @@
 ## Purpose
 Define authoritative graph structure, node/edge semantics, and baseline evaluation metrics for the risk atlas.
 
+**Last updated:** 2026-03-24
+
 Report schema details are defined in `docs/specs/artifact-schemas.md`.
 
 ## Graph Types
@@ -13,16 +15,20 @@ Report schema details are defined in `docs/specs/artifact-schemas.md`.
 
 ### Model Node
 Required attributes:
+- `node_type` (`Model`)
+- `model_id`
 - `hf_model_id`
 - `source_repo_url`
 - `snapshot_timestamp_utc`
 
 ### Package Node
 Required attributes:
+- `node_type` (`Package`)
 - `ecosystem`
 - `name`
 - `version`
 - `vuln_status`
+- `vuln_ids_json` (JSON-encoded sorted array string; GraphML-safe encoding of package vulnerability IDs)
 - `num_vulns`
 - `max_severity_bucket`
 - `fix_available`
@@ -30,11 +36,21 @@ Required attributes:
 Identity invariant:
 - Deduplicate package nodes by `(ecosystem, name, version)`.
 
+Duplicate-package merge rule (when the same package key appears in multiple normalized inputs):
+- union vulnerability IDs, then recalculate `num_vulns`,
+- keep the highest observed `max_severity_bucket`,
+- set `fix_available=true` if any contributing record has a fix available,
+- resolve `vuln_status` conservatively with precedence `vulnerable > unknown > not_vulnerable`.
+
 ## Edge Semantics
 
 ### Required in v1
 - `uses_package` (Model -> Package)
-  - attributes: `dependency_scope`, `depth`, `manifest_source`
+  - attributes: `edge_type` (`uses_package`), `dependency_scope`, `depth`, `manifest_source`
+  - deterministic depth rule for v1:
+    - `direct` -> `0`
+    - `transitive` -> `1`
+    - `unknown` -> `-1`
 
 ### Optional / deferred
 - `depends_on` (Package -> Package)

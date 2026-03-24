@@ -113,15 +113,15 @@ Construct global typed atlas graph and validate semantic correctness.
 - Optional: `graphs/per_model/<model_id>.graphml`
 
 **Checklist**
-- [ ] Build `Model` and `Package` nodes with required attributes.
-- [ ] Build `uses_package` edges with required attributes.
-- [ ] Deduplicate packages strictly by `(ecosystem, name, version)`.
-- [ ] Enforce graph integrity checks (edge endpoints exist, required attrs present).
+- [x] Build `Model` and `Package` nodes with required attributes.
+- [x] Build `uses_package` edges with required attributes.
+- [x] Deduplicate packages strictly by `(ecosystem, name, version)`.
+- [x] Enforce graph integrity checks (edge endpoints exist, required attrs present).
 
 **Acceptance gate**
-- [ ] Global graph loads without schema/typing errors.
-- [ ] Package deduplication and per-model counts match normalized inputs.
-- [ ] Deferred `depends_on` edges are not required for v1 completion.
+- [x] Global graph loads without schema/typing errors.
+- [x] Package deduplication and per-model counts match normalized inputs.
+- [x] Deferred `depends_on` edges are not required for v1 completion.
 
 ### M4: Reporting and Atlas Outputs
 

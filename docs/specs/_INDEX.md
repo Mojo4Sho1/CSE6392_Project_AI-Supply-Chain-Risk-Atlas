@@ -28,7 +28,7 @@ Purpose: route agents to only the specification documents needed for the current
 - `read-when`: tasks involve fetching dependency artifacts, scanning vulnerabilities, or writing normalized outputs.
 
 - `path`: `docs/specs/graph-semantics-and-metrics.md`
-- `summary`: graph node/edge semantics and required baseline metrics for atlas evaluation.
+- `summary`: graph node/edge semantics, GraphML-safe typing/merge rules, and required baseline metrics for atlas evaluation.
 - `tags`: `graph`, `metrics`, `networkx`, `risk-structure`
 - `read-when`: tasks involve graph construction, edge rules, deduplication identity, or reporting metrics.
 

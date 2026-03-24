@@ -3,7 +3,7 @@ INPUT     := data/models.csv
 OUTROOT   := .
 TIMESTAMP := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 
-.PHONY: test ingest scan clean
+.PHONY: test ingest scan graph clean
 
 test:
 	$(PYTHON) -m pytest -q
@@ -17,6 +17,12 @@ ingest:
 scan:
 	$(PYTHON) scripts/run_osv_scan.py \
 	  --input manifests \
+	  --output-root $(OUTROOT) \
+	  --snapshot-timestamp "$(TIMESTAMP)"
+
+graph:
+	$(PYTHON) scripts/build_risk_graph.py \
+	  --input osv \
 	  --output-root $(OUTROOT) \
 	  --snapshot-timestamp "$(TIMESTAMP)"
 

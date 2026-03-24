@@ -52,8 +52,8 @@ Phased implementation roadmap for the AI Supply Chain Risk Atlas pipeline. Agent
 
 **Goal:** Build the global typed atlas graph.
 
-- [ ] Implement `scripts/build_risk_graph.py` + tests (T-017)
-- [ ] Add `make graph` target (T-018)
+- [x] Implement `scripts/build_risk_graph.py` + tests (T-017)
+- [x] Add `make graph` target (T-018)
 
 **Gate:** `graphs/global.graphml` loads cleanly. Package deduplication matches normalized inputs. No `depends_on` edges required.
 

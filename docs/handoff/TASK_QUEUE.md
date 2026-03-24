@@ -54,14 +54,14 @@ Prioritized backlog of discrete, agent-executable tasks. After completing assign
 
 | ID | Status | Task | Specs to Read | Acceptance Criteria |
 |----|--------|------|---------------|---------------------|
-| T-017 | active | Implement `build_risk_graph.py` + tests | `graph-semantics-and-metrics.md`, `artifact-schemas.md`, `pipeline-execution-contract.md` | `global.graphml` loads; correct node/edge types; package deduplication verified |
-| T-018 | queued | Add `make graph` target | — | `make graph` runs graph build script |
+| T-017 | done | Implement `build_risk_graph.py` + tests | `graph-semantics-and-metrics.md`, `artifact-schemas.md`, `pipeline-execution-contract.md` | `global.graphml` loads; correct node/edge types; package deduplication verified |
+| T-018 | done | Add `make graph` target | — | `make graph` runs graph build script |
 
 ## Phase 4: M4 — Reporting & Atlas
 
 | ID | Status | Task | Specs to Read | Acceptance Criteria |
 |----|--------|------|---------------|---------------------|
-| T-019 | queued | Implement `generate_atlas_reports.py` + tests | `graph-semantics-and-metrics.md`, `artifact-schemas.md`, `pipeline-execution-contract.md` | `summary.json` + `summary.csv` + `figures/` produced; schema-valid |
+| T-019 | active | Implement `generate_atlas_reports.py` + tests | `graph-semantics-and-metrics.md`, `artifact-schemas.md`, `pipeline-execution-contract.md` | `summary.json` + `summary.csv` + `figures/` produced; schema-valid |
 | T-020 | queued | Add `make report` and `make all` targets | — | `make all` runs full pipeline end-to-end |
 
 ## Phase 5: Polish & Submission
