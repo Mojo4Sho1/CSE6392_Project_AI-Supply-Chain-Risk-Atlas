@@ -81,8 +81,14 @@ Phased implementation roadmap for the AI Supply Chain Risk Atlas pipeline. Agent
 - [x] Draft dashboard showcase spec and route docs (T-023)
 - [x] Implement local Dash/Plotly dashboard + tests (T-024)
 - [x] Add `make dashboard` target and demo instructions (T-025)
+- [x] Review the live dashboard and lock the redesign roadmap (T-026)
 - [x] Create simple LaTeX report scaffold for the final write-up (T-028)
-- [ ] Evaluate live dashboard UX and decide on Cytoscape follow-on (T-026)
-- [ ] Implement optional Cytoscape renderer if approved (T-027)
+- [ ] Dashboard redesign Stage 0: audit and refactor preparation (T-029)
+- [ ] Dashboard redesign Stage 1: new app shell, layout, and theme (T-030)
+- [ ] Dashboard redesign Stage 2: branding pass and visual refinement (T-031)
+- [ ] Dashboard redesign Stage 3: Cytoscape migration (T-032)
+- [ ] Dashboard redesign Stage 4: selection workflow and inspector redesign (T-033)
+- [ ] Dashboard redesign Stage 5: filters, search, and linked summary views (T-034)
+- [ ] Dashboard redesign Stage 6: final polish for local research use (T-035)
 
-**Gate:** All milestone gates pass. All docs current. Pipeline reproducible end-to-end. Optional showcase dashboard launches locally from the documented artifacts. Renderer upgrades remain elective.
+**Gate:** All milestone gates pass. All docs current. Pipeline reproducible end-to-end. Optional showcase dashboard launches locally from the documented artifacts. Post-implementation redesign work follows `docs/dashboard_redesign_plan.md` one stage at a time.

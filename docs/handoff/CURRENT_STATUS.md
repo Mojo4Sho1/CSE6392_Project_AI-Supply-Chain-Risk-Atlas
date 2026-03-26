@@ -5,11 +5,11 @@
 
 ## Current focus
 
-The optional local dashboard showcase is implemented and verified, and the next major product-facing question is still whether the current Plotly renderer is good enough to keep. In parallel, the repo now also contains a simple LaTeX report scaffold so the final write-up can be drafted in-repo before moving to Overleaf.
+The optional local dashboard showcase is implemented and verified, and the redesign direction is now locked in `docs/dashboard_redesign_plan.md`. The next engineering batch is no longer a vague Plotly-vs-Cytoscape evaluation; it is **Dashboard Redesign Stage 0: audit and refactor preparation**, with Plotly retained for now and Cytoscape deferred to a later stage.
 
 ## Completed in current focus
 
-- Completed T-024 through T-025 and T-028:
+- Completed T-024, T-025, T-026, and T-028:
   - added dashboard runtime dependencies to `environment.yml`: `dash` and `plotly`
   - implemented the swap-friendly dashboard stack:
     - `scripts/run_dashboard.py`
@@ -26,6 +26,15 @@ The optional local dashboard showcase is implemented and verified, and the next 
     - `tests/integration/test_run_dashboard.py`
   - added `make dashboard` and extended `make validate` to include `python scripts/run_dashboard.py --help`
   - updated `README.md` and `docs/specs/dashboard-showcase.md` to document the single-page Plotly dashboard, launch flow, and future renderer seam
+  - reviewed the live dashboard and replaced the old binary renderer decision path with a staged redesign roadmap in `docs/dashboard_redesign_plan.md`
+  - locked the redesign direction:
+    - graph-first application shell
+    - dark shell with light graph canvas
+    - single-node inspector workflow
+    - package labels hidden by default
+    - Plotly kept through Stages 0-2
+    - Cytoscape migration deferred to Stage 3
+    - implement one stage per batch only
   - added a simple repo-local final report scaffold:
     - `paper/final_report.tex`
     - `paper/README.md`
@@ -55,7 +64,8 @@ The optional local dashboard showcase is implemented and verified, and the next 
 ## Known gaps/blockers
 
 - No core project blockers remain
-- The only open question is optional: whether the current Plotly renderer is visually strong enough, or whether a Cytoscape follow-on would materially improve the demo
+- The redesign itself is not implemented yet; only the roadmap is locked
+- Stage 0 through Stage 6 remain to be completed one batch at a time
 - `make dashboard` needs a real local socket bind; in the sandbox it reaches startup and then requires elevated launch permissions to complete the bind
 - The report scaffold is ready for editing, but local PDF compilation was not verified because no TeX toolchain is installed in this environment
 
@@ -63,13 +73,22 @@ The optional local dashboard showcase is implemented and verified, and the next 
 
 - The dashboard now uses an explicit data/view/render split so a future `dash-cytoscape` renderer can be added without rewriting artifact loading or filter/detail logic
 - `docs/specs/dashboard-showcase.md` is aligned with the implemented Plotly dashboard and the future renderer seam
+- `docs/dashboard_redesign_plan.md` is now the authoritative roadmap for all dashboard redesign work
+- Fresh agents should treat the redesign as a staged delivery:
+  - Stage 0: audit and refactor preparation
+  - Stage 1: new app shell, layout, and theme
+  - Stage 2: branding and visual refinement
+  - Stage 3: Cytoscape migration
+  - Stage 4: inspector redesign
+  - Stage 5: filters, search, and linked summaries
+  - Stage 6: final polish
 - `paper/final_report.tex` is intentionally a simple single-file LaTeX draft, modeled after the user's preferred style, so it can be copied into Overleaf later with minimal restructuring
 - No `PROJECT_CHECKLIST.md` milestone or gate state changed in this batch; this was a documentation/report-scaffold addition rather than a new pipeline milestone
-- The next agent should start with T-026: review the live Plotly dashboard and make an explicit keep-vs-Cytoscape recommendation before opening a renderer migration batch
+- The next agent should start with **T-029 / Stage 0 only** and avoid drifting into Stage 1 visual redesign in the same batch
 
 ## Next task (single target)
 
-Evaluate the live dashboard UX and decide whether the project should keep the current Plotly renderer or open an optional Cytoscape follow-on. See `NEXT_TASK.md` for the current brief and `TASK_QUEUE.md` for the backlog.
+Implement Dashboard Redesign Stage 0: audit and refactor preparation. See `NEXT_TASK.md` for the stage brief and `TASK_QUEUE.md` for the staged backlog.
 
 ## Definition of done for next task
 

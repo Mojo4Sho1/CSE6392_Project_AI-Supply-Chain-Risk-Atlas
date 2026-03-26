@@ -62,7 +62,7 @@ Validate the completed M1-M4 pipeline end-to-end from the repository root and re
 **Acceptance gate**
 - [x] No stale `models.json` references remain in active README/spec/handoff docs.
 - [x] README, specs, and handoff docs express one artifact-only ingestion policy and one required v1 graph edge policy (`uses_package`, with `depends_on` deferred).
-- [x] The post-validation backlog is narrowed to the optional dashboard showcase track.
+- [x] The post-validation backlog is narrowed to the optional dashboard showcase and redesign track.
 
 ### Phase 5B: Showcase Dashboard
 
@@ -89,6 +89,11 @@ Implement and verify the optional local dashboard as a read-only presentation la
 - [x] `make validate` passes after the dashboard additions.
 - [x] `make dashboard` launches locally on `127.0.0.1:8050` with the documented defaults.
 - [x] The renderer seam is explicit enough that a future Cytoscape renderer can reuse the same data/view-model layer.
+
+**Post-gate refinement note**
+- Future dashboard redesign work is governed by `docs/dashboard_redesign_plan.md`.
+- Implement one redesign stage per batch; do not combine major stages.
+- Keep Plotly in place through Stages 0-2 and defer Cytoscape migration to Stage 3.
 
 ### M1: Ingestion and Eligibility Baseline
 
@@ -204,7 +209,7 @@ Produce baseline metrics/rankings and final report artifacts from the graph.
 Validation status for this repository snapshot (`2026-03-26`):
 
 - Routing test:
-  - passed; the required read order plus rewritten handoff files point cleanly to the dashboard showcase track.
+  - passed; the required read order plus rewritten handoff files now point cleanly to the staged dashboard redesign track anchored by `docs/dashboard_redesign_plan.md`.
 - Contract test:
   - partially covered by the existing schema-contract unit/integration suite; the repo does not maintain a second independent implementation for direct output comparison.
 - Determinism test:
@@ -216,7 +221,7 @@ Validation status for this repository snapshot (`2026-03-26`):
 - Handoff continuity test:
   - passed; `CURRENT_STATUS.md` and `NEXT_TASK.md` were rewritten in the required format without introducing new policy assumptions.
 - Showcase dashboard test:
-  - passed; the Plotly dashboard launches locally, reads the live graph/report artifacts at startup, and leaves only optional renderer evaluation work.
+  - passed; the Plotly dashboard launches locally, reads the live graph/report artifacts at startup, and the post-validation UI backlog is now organized into explicit redesign stages.
 
 ## Handoff Obligations Per Batch
 

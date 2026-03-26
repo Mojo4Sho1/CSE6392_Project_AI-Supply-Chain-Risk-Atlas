@@ -98,4 +98,29 @@ figures/                                   # M4: visualizations
 | Test fixtures, coverage gates | `testing-and-validation.md` |
 | Policy defaults, locked decisions | `decision-log.md` |
 
+## Dashboard Redesign Routing (2026-03-26)
+
+If the active task touches dashboard redesign or UI work, read `docs/dashboard_redesign_plan.md` immediately after the standard handoff files.
+
+Locked redesign decisions:
+
+- implement one redesign stage per batch; do not combine stages
+- keep Dash as the app framework
+- keep the current Plotly renderer through Stages 0-2
+- defer Cytoscape migration to Stage 3
+- preserve current analytical semantics unless a stage explicitly changes presentation behavior
+- use a graph-first shell: top bar, left sidebar, center graph, right inspector
+- keep single-node selection only; do not add compare mode
+- hide package labels by default and allow a label toggle later
+- use a dark shell with a light graph canvas
+
+Current dashboard code locations:
+
+- `scripts/run_dashboard.py`
+- `scripts/_utils/dashboard_data.py`
+- `scripts/_utils/dashboard_view.py`
+- `scripts/_utils/dashboard_render_plotly.py`
+- `scripts/_utils/dashboard_app.py`
+- `assets/dashboard.css`
+
 Full routing table with tags: `docs/specs/_INDEX.md`
