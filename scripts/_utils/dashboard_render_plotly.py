@@ -203,7 +203,6 @@ def _model_hover_template(model_nodes: list[DashboardNode]) -> list[str]:
     return [
         (
             f"<b>{node.attrs['hf_model_id']}</b><br>"
-            f"model_id={node.attrs['model_id']}<br>"
             f"direct={node.attrs['direct_dependency_count']} | "
             f"transitive={node.attrs['transitive_dependency_count']}<br>"
             f"vulnerable direct={node.attrs['vulnerable_direct_dependencies']} | "

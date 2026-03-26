@@ -8,6 +8,6 @@ Preferred logo path:
 
 Notes:
 
-- Stage 1 should keep layout logic flexible enough that the logo can be shown or hidden without structural rewrites.
-- Stage 2 is the first stage that should experiment with visible logo placement.
+- The current dashboard direction does not use a visible logo in the UI; color, typography, and spacing carry the branding instead.
+- Keep layout logic flexible enough that a future agent could test an optional asset without structural rewrites if requirements change later.
 - Keep filenames stable when possible so future dashboard code can reference one default location.

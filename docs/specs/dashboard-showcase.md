@@ -10,10 +10,11 @@ Define the v1 local showcase dashboard for the AI Supply Chain Risk Atlas. This 
 
 - Delivery target: local-only v1 dashboard
 - Framework: Dash + Plotly
-- Layout model: single-page graph-first shell with a top bar, left control/sidebar, center graph explorer, and right detail inspector
+- Layout model: single-page graph-first shell with a top bar, left control/sidebar, center graph explorer, right detail inspector, and supporting insight panels beneath the graph
 - Role in project: optional showcase layer after M4, not a required milestone pipeline output
 - Data policy: read-only consumer of pipeline artifacts; must not recompute or mutate M1-M4 outputs
 - Renderer policy: keep a renderer seam so a future Cytoscape renderer can reuse the same data/view-model layer
+- Branding direction: no visible logo is required in the current UI; the default presentation can rely on palette, type, and layout alone
 
 ## Inputs
 
@@ -52,7 +53,7 @@ Operational rules:
 
 ## Required app surfaces
 
-The v1 dashboard is a single-page app. Stage 1 organizes these surfaces inside a graph-first shell: top bar, left sidebar, center graph pane, and right inspector. These surfaces may appear as sections within that shell rather than as separate routes.
+The v1 dashboard is a single-page app. The current shell organizes these surfaces as a top bar, left sidebar, center graph pane, right inspector, and a lower insight row beneath the graph. These surfaces may appear as sections within that shell rather than as separate routes.
 
 ### 1) Overview / context surfaces
 
@@ -65,7 +66,7 @@ Must show:
 - average transitive packages per model
 - top reused vulnerable packages
 
-These may live in compact cards or tables inside the top bar or left sidebar rather than a dedicated overview row.
+These may live in compact cards or tables inside the top bar or the lower insight row beneath the graph rather than a dedicated overview row.
 
 ### 2) Graph explorer
 
@@ -80,7 +81,6 @@ Must show:
 Must show, for a selected model:
 
 - `hf_model_id`
-- `model_id`
 - dependency counts split by direct/transitive when available
 - vulnerable direct dependency count
 - vulnerable transitive dependency count
@@ -105,7 +105,6 @@ Must show, for a selected package:
 The v1 dashboard must support:
 
 - search by `hf_model_id`
-- search by `model_id`
 - search by package name
 - filter by node type
 - filter by `dependency_scope`

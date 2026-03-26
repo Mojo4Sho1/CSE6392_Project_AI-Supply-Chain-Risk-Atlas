@@ -40,6 +40,8 @@ def test_render_visible_graph_emits_plotly_traces_with_node_ids(tmp_path):
             customdata_values.extend(list(trace.customdata))
     assert "model::example--model-a--11111111" in customdata_values
     assert state.package_lookup_by_name["shared-lib"][0].node_id in customdata_values
+    model_trace = next(trace for trace in figure.data if getattr(trace, "name", None) == "Models")
+    assert "model_id=" not in "".join(model_trace.hovertemplate)
     assert figure.layout.plot_bgcolor == DEFAULT_DASHBOARD_THEME.palette.graph_canvas_background
     assert figure.layout.font.color == DEFAULT_DASHBOARD_THEME.palette.graph_canvas_text
 

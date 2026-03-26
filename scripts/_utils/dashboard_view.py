@@ -129,8 +129,6 @@ def build_selection_detail(
         return {
             "kind": "model",
             "rows": [
-                ("Hugging Face model", str(node.attrs["hf_model_id"])),
-                ("Model ID", str(node.attrs["model_id"])),
                 ("Direct dependencies", str(node.attrs["direct_dependency_count"])),
                 ("Transitive dependencies", str(node.attrs["transitive_dependency_count"])),
                 (

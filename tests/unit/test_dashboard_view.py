@@ -109,6 +109,8 @@ def test_build_selection_detail_for_model_and_package(tmp_path):
     package_detail = build_selection_detail(state, selected_node_id=package_node_id)
 
     assert model_detail["kind"] == "model"
+    assert ("Model ID", "example--model-a--11111111") not in model_detail["rows"]
+    assert ("Hugging Face model", "example/model-a") not in model_detail["rows"]
     assert ("Direct dependencies", "1") in model_detail["rows"]
     assert package_detail["kind"] == "package"
     assert ("Impacted model count", "2") in package_detail["rows"]

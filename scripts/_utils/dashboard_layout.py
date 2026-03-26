@@ -1,5 +1,5 @@
 """
-dashboard_layout.py - Dash component construction for the Stage 1 dashboard shell.
+dashboard_layout.py - Dash component construction for the current dashboard shell.
 """
 
 from __future__ import annotations
@@ -26,7 +26,7 @@ def build_dashboard_layout(
     *,
     theme: DashboardTheme = DEFAULT_DASHBOARD_THEME,
 ) -> html.Div:
-    """Build the static Stage 1 dashboard component tree."""
+    """Build the current graph-first dashboard component tree."""
     initial_outputs = compute_dashboard_outputs(
         state,
         search_text="",
@@ -90,6 +90,7 @@ def build_dashboard_layout(
                                 className="dashboard-sidebar dashboard-sidebar-left",
                                 children=[
                                     html.Section(
+                                        id="filters-panel",
                                         className="sidebar-section",
                                         children=[
                                             _panel_heading(
@@ -105,7 +106,7 @@ def build_dashboard_layout(
                                                 id="search-input",
                                                 className="text-input",
                                                 debounce=True,
-                                                placeholder="hf_model_id, model_id, or package name",
+                                                placeholder="Hugging Face model or package name",
                                                 type="text",
                                                 value="",
                                             ),
@@ -132,65 +133,6 @@ def build_dashboard_layout(
                                                 "severity-filter",
                                                 ALL_SEVERITY_BUCKETS,
                                                 list(ALL_SEVERITY_BUCKETS),
-                                            ),
-                                        ],
-                                    ),
-                                    html.Section(
-                                        className="sidebar-section",
-                                        children=[
-                                            _panel_heading(
-                                                "Snapshot Metrics",
-                                                "Compact atlas context from reports/summary.json.",
-                                            ),
-                                            html.Div(
-                                                className="sidebar-metric-grid",
-                                                children=[
-                                                    _metric_card(
-                                                        "Unique packages",
-                                                        str(package_count),
-                                                        "Shared package nodes in the atlas.",
-                                                    ),
-                                                    _metric_card(
-                                                        "Avg packages / model",
-                                                        _format_metric(
-                                                            state.summary_payload["global_metrics"][
-                                                                "average_packages_per_model"
-                                                            ]
-                                                        ),
-                                                        "Mean dependency footprint.",
-                                                    ),
-                                                    _metric_card(
-                                                        "Avg direct / model",
-                                                        _format_metric(
-                                                            state.summary_payload["global_metrics"][
-                                                                "average_direct_packages_per_model"
-                                                            ]
-                                                        ),
-                                                        "Visible direct package use.",
-                                                    ),
-                                                    _metric_card(
-                                                        "Avg transitive / model",
-                                                        _format_metric(
-                                                            state.summary_payload["global_metrics"][
-                                                                "average_transitive_packages_per_model"
-                                                            ]
-                                                        ),
-                                                        "Visible transitive package use.",
-                                                    ),
-                                                ],
-                                            ),
-                                        ],
-                                    ),
-                                    html.Section(
-                                        className="sidebar-section",
-                                        children=[
-                                            _panel_heading(
-                                                "Reuse Hotspots",
-                                                "Most reused vulnerable packages in the current artifact snapshot.",
-                                            ),
-                                            html.Div(
-                                                className="table-shell",
-                                                children=[_build_reused_package_table(state)],
                                             ),
                                         ],
                                     ),
@@ -268,7 +210,81 @@ def build_dashboard_layout(
                                                 ],
                                             ),
                                         ],
-                                    )
+                                    ),
+                                    html.Div(
+                                        id="dashboard-bottom-panels",
+                                        className="dashboard-bottom-panels",
+                                        children=[
+                                            html.Section(
+                                                id="snapshot-metrics-panel",
+                                                className="insight-panel",
+                                                children=[
+                                                    _panel_heading(
+                                                        "Snapshot Metrics",
+                                                        (
+                                                            "Compact atlas context stays beneath the graph "
+                                                            "so the left rail can stay focused on controls."
+                                                        ),
+                                                    ),
+                                                    html.Div(
+                                                        className="insight-metric-grid",
+                                                        children=[
+                                                            _metric_card(
+                                                                "Unique packages",
+                                                                str(package_count),
+                                                                "Shared package nodes in the atlas.",
+                                                            ),
+                                                            _metric_card(
+                                                                "Avg packages / model",
+                                                                _format_metric(
+                                                                    state.summary_payload["global_metrics"][
+                                                                        "average_packages_per_model"
+                                                                    ]
+                                                                ),
+                                                                "Mean dependency footprint.",
+                                                            ),
+                                                            _metric_card(
+                                                                "Avg direct / model",
+                                                                _format_metric(
+                                                                    state.summary_payload["global_metrics"][
+                                                                        "average_direct_packages_per_model"
+                                                                    ]
+                                                                ),
+                                                                "Visible direct package use.",
+                                                            ),
+                                                            _metric_card(
+                                                                "Avg transitive / model",
+                                                                _format_metric(
+                                                                    state.summary_payload["global_metrics"][
+                                                                        "average_transitive_packages_per_model"
+                                                                    ]
+                                                                ),
+                                                                "Visible transitive package use.",
+                                                            ),
+                                                        ],
+                                                    ),
+                                                ],
+                                            ),
+                                            html.Section(
+                                                id="reuse-hotspots-panel",
+                                                className="insight-panel",
+                                                children=[
+                                                    _panel_heading(
+                                                        "Reuse Hotspots",
+                                                        (
+                                                            "Most reused vulnerable packages stay close to "
+                                                            "the graph so structural context and reuse context "
+                                                            "read together."
+                                                        ),
+                                                    ),
+                                                    html.Div(
+                                                        className="table-shell",
+                                                        children=[_build_reused_package_table(state)],
+                                                    ),
+                                                ],
+                                            ),
+                                        ],
+                                    ),
                                 ],
                             ),
                             html.Aside(

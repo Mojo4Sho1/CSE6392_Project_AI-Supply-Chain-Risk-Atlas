@@ -33,11 +33,30 @@ def _collect_component_ids(component) -> set[str]:
     return found
 
 
-def test_build_dashboard_layout_exposes_stage_one_shell_regions(tmp_path):
+def _find_component_by_id(component, target_id: str):
+    component_id = getattr(component, "id", None)
+    if component_id == target_id:
+        return component
+    children = getattr(component, "children", None)
+    if children is None:
+        return None
+    if isinstance(children, (list, tuple)):
+        for child in children:
+            found = _find_component_by_id(child, target_id)
+            if found is not None:
+                return found
+        return None
+    return _find_component_by_id(children, target_id)
+
+
+def test_build_dashboard_layout_exposes_shell_regions_and_bottom_insights(tmp_path):
     state = _build_state(tmp_path)
 
     layout = build_dashboard_layout(state)
     component_ids = _collect_component_ids(layout)
+    left_sidebar = _find_component_by_id(layout, "dashboard-sidebar-left")
+    main_pane = _find_component_by_id(layout, "dashboard-main-pane")
+    search_input = _find_component_by_id(layout, "search-input")
 
     assert layout.className == "dashboard-page"
     assert layout.style["--atlas-graph-canvas-text"] == (
@@ -48,12 +67,25 @@ def test_build_dashboard_layout_exposes_stage_one_shell_regions(tmp_path):
         "dashboard-sidebar-left",
         "dashboard-main-pane",
         "dashboard-sidebar-right",
+        "dashboard-bottom-panels",
+        "snapshot-metrics-panel",
+        "reuse-hotspots-panel",
         "search-input",
         "atlas-graph",
         "detail-panel",
         "graph-status-text",
         "selected-node-store",
     }.issubset(component_ids)
+    assert left_sidebar is not None
+    assert main_pane is not None
+    assert search_input is not None
+    assert search_input.placeholder == "Hugging Face model or package name"
+    assert "snapshot-metrics-panel" not in _collect_component_ids(left_sidebar)
+    assert "reuse-hotspots-panel" not in _collect_component_ids(left_sidebar)
+    assert {
+        "snapshot-metrics-panel",
+        "reuse-hotspots-panel",
+    }.issubset(_collect_component_ids(main_pane))
 
 
 def test_build_detail_panel_empty_state_uses_shell_guidance():

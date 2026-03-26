@@ -150,6 +150,9 @@ body {
 
 .dashboard-main-pane {
   min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--atlas-grid-gap);
 }
 
 .sidebar-section {
@@ -180,9 +183,9 @@ body {
   line-height: 1.45;
 }
 
-.sidebar-metric-grid {
+.insight-metric-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -316,13 +319,32 @@ body {
 }
 
 .graph-panel {
-  height: 100%;
+  flex: 1 1 auto;
   padding: var(--atlas-panel-padding);
   display: flex;
   flex-direction: column;
   gap: 14px;
   background:
     linear-gradient(180deg, rgba(4, 15, 38, 0.9) 0%, rgba(8, 25, 54, 0.95) 100%);
+}
+
+.dashboard-bottom-panels {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  gap: var(--atlas-grid-gap);
+}
+
+.insight-panel {
+  min-height: 0;
+  padding: var(--atlas-panel-padding);
+  border: 1px solid var(--atlas-surface-border);
+  border-radius: var(--atlas-radius-panel);
+  box-shadow: 0 18px 40px var(--atlas-surface-shadow);
+  backdrop-filter: blur(var(--atlas-shadow-blur));
+  background: var(--atlas-surface-background);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .graph-panel-top {
@@ -560,6 +582,10 @@ body {
     justify-content: flex-start;
   }
 
+  .dashboard-bottom-panels {
+    grid-template-columns: 1fr;
+  }
+
   .atlas-graph {
     height: clamp(420px, 64vh, 720px);
     min-height: 420px;
@@ -575,7 +601,7 @@ body {
   }
 
   .topbar-badges,
-  .sidebar-metric-grid {
+  .insight-metric-grid {
     grid-template-columns: 1fr;
   }
 

@@ -5,13 +5,13 @@
 
 ## Task summary
 
-Implement **Dashboard Redesign Stage 2: Branding Pass and Visual Refinement** from `docs/dashboard_redesign_plan.md`. This batch should polish the new Stage 1 shell with optional branding placement, clearer status styling, and more deliberate legend/empty-state/panel treatment while preserving the existing Plotly renderer and analytical behavior.
+Finish **Dashboard Redesign Stage 2: Branding Pass and Visual Refinement** from `docs/dashboard_redesign_plan.md`. The no-logo direction is now locked for the current UI, and the metrics/hotspot context belongs beneath the graph; the remaining work is to polish legend treatment, badges, empty states, and final panel styling while preserving the existing Plotly renderer and analytical behavior.
 
 **Task queue references:** T-031 (see `docs/handoff/TASK_QUEUE.md`)
 
 ## Why this task is next
 
-- Stage 1 is complete: the top bar / left sidebar / center graph / right inspector shell now exists, so Stage 2 can focus on visual cohesion instead of restructuring the app.
+- Stage 1 is complete and the first Stage 2 direction changes are now in place: no visible logo in the UI, and the metrics/hotspot panels belong beneath the graph instead of in the left rail.
 - The redesign plan explicitly separates branding polish from shell work, and this is the next bounded batch before the Stage 3 Cytoscape migration.
 
 Long-horizon reference:
@@ -21,15 +21,15 @@ Long-horizon reference:
 ## Recommended task order
 
 1. **T-031:** Read `docs/dashboard_redesign_plan.md` Stage 2, `docs/handoff/CURRENT_STATUS.md`, `docs/specs/dashboard-showcase.md`, and `assets/branding/README.md`
-2. **T-031:** Make branding treatments and any logo placement easy to enable, disable, or relocate without hard-requiring a logo asset
-3. **T-031:** Refine panel styling, badges, legend treatment, empty states, and microcopy in `scripts/_utils/dashboard_layout.py`, `scripts/_utils/dashboard_theme.py`, and `assets/dashboard.css`
+2. **T-031:** Refine panel styling, badges, legend treatment, empty states, and microcopy in `scripts/_utils/dashboard_layout.py`, `scripts/_utils/dashboard_theme.py`, and `assets/dashboard.css`
+3. **T-031:** Keep the no-logo default intact while making the visual system feel deliberate through spacing, hierarchy, and color treatment
 4. **T-031:** Keep the current Plotly renderer working, extend tests as needed, then update handoff docs so Stage 3 can focus on Cytoscape instead of revisiting branding polish
 
 ## Scope (in)
 
 - Dashboard Stage 2 only, as defined in `docs/dashboard_redesign_plan.md`
 - Branding-safe shell refinements inside the existing Stage 1 structure
-- Optional logo placement experiments or safe logo hooks
+- No-logo visual refinement using palette, typography, spacing, legend, and badge treatment
 - Legend, badge, heading, and empty-state polish
 - Small theme/layout refinements that improve cohesion without changing dashboard semantics
 - Tests for any changed layout/theme/branding behavior
@@ -67,14 +67,16 @@ Long-horizon reference:
 
 - Keep Plotly as the active renderer in this batch.
 - Treat the Stage 1 shell as the baseline; prefer polish over panel relocation.
-- Any logo treatment must degrade cleanly when `assets/branding/ai_supply_chain_risk_atlas_logo.png` is absent.
+- Do not add a visible logo back into the default dashboard UI unless requirements explicitly change.
+- Keep the lower insight row beneath the graph; do not move those panels back into the left rail.
+- Keep `model_id` hidden from the user-facing dashboard; use the Hugging Face model name as the displayed identifier.
 - If port `8050` is occupied locally during manual verification, confirm the default command behavior first and then use a temporary alternate port without changing the documented default.
 - Run `make test` after code changes and treat expected failure paths as normal outcomes, not crashes.
 
 ## Acceptance criteria (definition of done)
 
 - The dashboard has a more cohesive branded identity without destabilizing the Stage 1 shell
-- Logo placement, if introduced, is easy to enable/disable or relocate
+- The no-logo direction remains intact and the visual system still feels deliberate
 - Legend, badges, headings, and empty states feel deliberate and readable
 - Existing analytical semantics and the Plotly renderer still work
 - All tests pass (`make test`)
@@ -85,7 +87,8 @@ Long-horizon reference:
 - [ ] `python scripts/run_dashboard.py --help` works
 - [ ] `make dashboard` launches against the live repo artifacts
 - [ ] `make test` passes
-- [ ] Branding treatment is safe when the logo asset is absent
+- [ ] No visible logo is required for the default dashboard UI
+- [ ] Snapshot metrics and reuse hotspots remain beneath the graph, not in the left sidebar
 - [ ] The graph-first shell remains top bar / left sidebar / center graph / right inspector
 - [ ] Plotly is still the active renderer
 - [ ] No unresolved placeholder text in new code/docs
@@ -111,5 +114,5 @@ The next `NEXT_TASK.md` must itself include this same "Mandatory final subtask" 
 ## Risks / rollback notes
 
 - Do not drift into Stage 3 Cytoscape work under the label of Stage 2 polish
-- Do not hard-wire branding to a required asset file or a single fixed logo placement
+- Do not reintroduce the visible logo or move the supporting insight panels back into the left rail without an explicit design change
 - Do not let new branding treatments crowd the graph or undo the graph-first shell delivered in Stage 1
