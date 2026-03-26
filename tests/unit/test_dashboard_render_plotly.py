@@ -44,6 +44,7 @@ def test_render_visible_graph_emits_plotly_traces_with_node_ids(tmp_path):
     assert "model_id=" not in "".join(model_trace.hovertemplate)
     assert figure.layout.plot_bgcolor == DEFAULT_DASHBOARD_THEME.palette.graph_canvas_background
     assert figure.layout.font.color == DEFAULT_DASHBOARD_THEME.palette.graph_canvas_text
+    assert figure.layout.showlegend is False
 
 
 def test_render_visible_graph_does_not_mutate_visible_graph(tmp_path):

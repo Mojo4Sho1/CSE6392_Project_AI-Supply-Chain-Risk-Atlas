@@ -96,6 +96,7 @@ Implement and verify the optional local dashboard as a read-only presentation la
 - Keep Plotly in place through Stages 0-2 and defer Cytoscape migration to Stage 3.
 - Stage 0 redesign preparation is complete: theme tokens, layout/controller seams, repo `assets/` wiring, and a reserved branding asset home now exist so Stage 1 can focus on the shell and theme work directly.
 - Stage 1 redesign shell is complete: the dashboard now uses a top bar / left sidebar / center graph / right inspector shell with a dark application chrome and a light Plotly graph canvas, so Stage 2 can focus on branding polish rather than layout restructuring.
+- Stage 2 branding pass is complete: the in-shell legend now lives alongside the graph, package vulnerability IDs in the inspector open OSV advisories directly, and the no-logo shell polish is complete enough for Stage 3 to focus on the Cytoscape renderer migration rather than revisiting Stage 2 presentation work.
 
 ### M1: Ingestion and Eligibility Baseline
 
@@ -228,6 +229,8 @@ Validation status for this repository snapshot (`2026-03-26`):
   - passed; `dashboard_theme.py`, `dashboard_controller.py`, `dashboard_layout.py`, and `assets/branding/` now provide the explicit seams and asset home expected by `docs/dashboard_redesign_plan.md` Stage 0.
 - Dashboard Stage 1 shell test:
   - passed; the app layout now exposes the expected graph-first shell regions (top bar, left sidebar, center graph, right inspector) and the Plotly renderer uses dedicated light-canvas text tokens so labels remain readable inside the new shell.
+- Dashboard Stage 2 branding test:
+  - passed; the graph now uses a compact in-shell legend, the package inspector renders external OSV advisory links, the default no-logo direction remains intact, and dashboard verification still passed with the existing live graph/report artifacts.
 
 ## Handoff Obligations Per Batch
 

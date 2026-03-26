@@ -100,6 +100,11 @@ Must show, for a selected package:
 - impacted model count
 - associated vulnerability IDs
 
+Vulnerability ID presentation rule:
+
+- render each vulnerability ID as a clickable external link to `https://osv.dev/vulnerability/<ID>`
+- do not require the dashboard to store or display local advisory descriptions for this feature
+
 ## Required interactions
 
 The v1 dashboard must support:
@@ -111,6 +116,7 @@ The v1 dashboard must support:
 - filter by `vuln_status`
 - filter by severity bucket
 - click/select behavior that updates a side-panel detail view
+- clicking a vulnerability ID in the package inspector should open the corresponding OSV page in a new browser tab/window
 
 Interaction defaults:
 
@@ -123,6 +129,7 @@ Interaction defaults:
 - treat `graphs/global.graphml` as the source of truth for node/edge relationships
 - treat `reports/summary.json` and `reports/summary.csv` as the source of truth for precomputed M4 metrics/rankings
 - parse package vulnerability IDs from `vuln_ids_json` on package nodes because GraphML stores scalar attributes only
+- for the dashboard UI, vulnerability IDs are sufficient to build external OSV links; local advisory summaries/descriptions are not required
 - keep dashboard internals split into:
   - a data layer that loads and normalizes artifacts
   - a pure view-model layer for filtering/search/detail logic

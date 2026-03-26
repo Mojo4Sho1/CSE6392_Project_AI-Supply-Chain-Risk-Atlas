@@ -53,7 +53,7 @@ Purpose: route agents to only the specification documents needed for the current
 - `read-when`: any task depends on policy choices such as sample sizing, unpinned handling, or required graph edges.
 
 - `path`: `docs/specs/dashboard-showcase.md`
-- `summary`: local single-page Dash + Plotly showcase dashboard contract, including the graph-first shell, lower insight row, Hugging Face-first/no-logo presentation direction, swap-friendly renderer seam, required inputs/views/interactions, and runtime defaults.
+- `summary`: local single-page Dash + Plotly showcase dashboard contract, including the graph-first shell, lower insight row, Hugging Face-first/no-logo presentation direction, external OSV vulnerability links in the inspector, swap-friendly renderer seam, required inputs/views/interactions, and runtime defaults.
 - `tags`: `dashboard`, `showcase`, `ui`, `dash`, `plotly`
 - `read-when`: tasks involve the interactive local demo app, dashboard data/view/render layering, UI behavior, or `make dashboard`.
 

@@ -58,26 +58,48 @@ def build_dashboard_layout(
                                 children=[
                                     html.P("AI Supply Chain Risk Atlas", className="eyebrow"),
                                     html.H1("Graph Risk Explorer"),
-                                    html.P(
-                                        (
-                                            "A graph-first local research shell over the validated "
-                                            "M1-M4 artifacts. Filters and details support the atlas "
-                                            "without overpowering it."
-                                        ),
-                                        className="header-subtitle",
+                                    html.Div(
+                                        id="dashboard-metadata-ribbon",
+                                        className="dashboard-metadata-ribbon",
+                                        children=[
+                                            _context_chip(
+                                                "Initial scope",
+                                                (
+                                                    f"{len(state.node_lookup)} nodes | "
+                                                    f"{len(state.edges)} edges"
+                                                ),
+                                            ),
+                                            _context_chip(
+                                                "Selection",
+                                                "Single-node inspector",
+                                            ),
+                                            _context_chip(
+                                                "Inspector links",
+                                                "OSV advisories",
+                                            ),
+                                            _context_chip(
+                                                "Labels",
+                                                "Models default, packages on select",
+                                            ),
+                                        ],
                                     ),
                                 ],
                             ),
                             html.Div(
                                 className="topbar-badges",
                                 children=[
-                                    _topbar_badge("Dataset", f"{model_count} models"),
-                                    _topbar_badge("Package nodes", f"{package_count} packages"),
+                                    _topbar_badge("Atlas scope", f"{model_count} models", tone="atlas"),
+                                    _topbar_badge(
+                                        "Package nodes",
+                                        f"{package_count} packages",
+                                        tone="canvas",
+                                    ),
                                     _topbar_badge(
                                         "Reuse hotspots",
                                         f"{reused_vulnerable_count} vulnerable packages",
+                                        tone="risk",
                                     ),
-                                    _topbar_badge("Renderer", "Plotly active"),
+                                    _topbar_badge("Renderer", "Plotly active", tone="renderer"),
                                 ],
                             ),
                         ],
@@ -95,7 +117,10 @@ def build_dashboard_layout(
                                         children=[
                                             _panel_heading(
                                                 "Search + Filters",
-                                                "Narrow the visible graph by entity type, scope, and risk state.",
+                                                (
+                                                    "Narrow the visible atlas by entity type, scope, and "
+                                                    "risk state without pulling focus away from the graph."
+                                                ),
                                             ),
                                             html.Label(
                                                 "Search",
@@ -109,6 +134,13 @@ def build_dashboard_layout(
                                                 placeholder="Hugging Face model or package name",
                                                 type="text",
                                                 value="",
+                                            ),
+                                            html.P(
+                                                (
+                                                    "Search matches Hugging Face model names and package "
+                                                    "names, then keeps adjacent graph context visible."
+                                                ),
+                                                className="control-note",
                                             ),
                                             _checklist_block(
                                                 "Node type",
@@ -146,41 +178,34 @@ def build_dashboard_layout(
                                         className="graph-panel",
                                         children=[
                                             html.Div(
-                                                className="graph-panel-top",
+                                                className="graph-stage",
                                                 children=[
-                                                    _panel_heading(
-                                                        "Atlas Graph",
-                                                        (
-                                                            "Model-package reuse and vulnerability exposure "
-                                                            "stay centered, with labels optimized for the "
-                                                            "current Plotly renderer."
-                                                        ),
-                                                    ),
                                                     html.Div(
-                                                        className="graph-meta-row",
+                                                        id="graph-legend",
+                                                        className="graph-legend-overlay",
                                                         children=[
-                                                            _context_chip(
-                                                                "Initial scope",
-                                                                (
-                                                                    f"{len(state.node_lookup)} nodes | "
-                                                                    f"{len(state.edges)} edges"
-                                                                ),
+                                                            _legend_item(
+                                                                "graph-legend-item-model",
+                                                                "Model",
+                                                                "model",
                                                             ),
-                                                            _context_chip(
-                                                                "Selection",
-                                                                "Single-node inspector",
+                                                            _legend_item(
+                                                                "graph-legend-item-vulnerable",
+                                                                "Vulnerable",
+                                                                "vulnerable",
                                                             ),
-                                                            _context_chip(
-                                                                "Labels",
-                                                                "Models default, packages on select",
+                                                            _legend_item(
+                                                                "graph-legend-item-unknown",
+                                                                "Unknown",
+                                                                "unknown",
+                                                            ),
+                                                            _legend_item(
+                                                                "graph-legend-item-safe",
+                                                                "Not vulnerable",
+                                                                "not-vulnerable",
                                                             ),
                                                         ],
                                                     ),
-                                                ],
-                                            ),
-                                            html.Div(
-                                                className="graph-stage",
-                                                children=[
                                                     dcc.Graph(
                                                         id="atlas-graph",
                                                         className="atlas-graph",
@@ -203,7 +228,8 @@ def build_dashboard_layout(
                                                     html.P(
                                                         (
                                                             "Search and filters intersect deterministically "
-                                                            "across the live graph and report artifacts."
+                                                            "across the live graph and report artifacts, and "
+                                                            "package advisories open directly in OSV from the inspector."
                                                         ),
                                                         className="graph-caption",
                                                     ),
@@ -304,7 +330,7 @@ def build_dashboard_layout(
                                                     html.P(
                                                         (
                                                             "Click a node in the graph to inspect dependency "
-                                                            "counts, risk metadata, and vulnerability IDs "
+                                                            "counts, risk metadata, and OSV advisory links "
                                                             "without leaving the main canvas."
                                                         )
                                                     )
@@ -372,11 +398,23 @@ def build_detail_panel(detail_payload: dict[str, object]) -> html.Div:
             html.Div(
                 className="detail-vulns",
                 children=[
-                    html.P("Associated vulnerability IDs", className="detail-section-title"),
+                    html.P("OSV advisories", className="detail-section-title"),
+                    html.P(
+                        "Open the published advisory for this package in a new tab.",
+                        className="detail-vuln-note",
+                    )
+                    if vulnerability_ids
+                    else None,
                     html.Div(
                         className="detail-chip-list",
                         children=[
-                            html.Span(str(vuln_id), className="detail-chip")
+                            html.A(
+                                str(vuln_id),
+                                className="detail-chip detail-chip-link",
+                                href=_build_osv_vulnerability_url(vuln_id),
+                                rel="noreferrer noopener",
+                                target="_blank",
+                            )
                             for vuln_id in vulnerability_ids
                         ],
                     )
@@ -402,9 +440,9 @@ def _metric_card(title: str, value: str, description: str) -> html.Div:
     )
 
 
-def _topbar_badge(label: str, value: str) -> html.Div:
+def _topbar_badge(label: str, value: str, *, tone: str = "default") -> html.Div:
     return html.Div(
-        className="topbar-badge",
+        className=f"topbar-badge topbar-badge-{tone}",
         children=[
             html.P(label, className="topbar-badge-label"),
             html.P(value, className="topbar-badge-value"),
@@ -455,7 +493,17 @@ def _build_reused_package_table(state: DashboardState) -> html.Table:
             )
         )
     if not body_rows:
-        body_rows.append(html.Tr([html.Td("No vulnerable packages", colSpan=3)]))
+        body_rows.append(
+            html.Tr(
+                [
+                    html.Td(
+                        "No reused vulnerable packages in the current artifact set.",
+                        className="overview-table-empty",
+                        colSpan=3,
+                    )
+                ]
+            )
+        )
     return html.Table(className="overview-table", children=[header, html.Tbody(body_rows)])
 
 
@@ -483,3 +531,20 @@ def _checklist_block(
 
 def _format_metric(value: object) -> str:
     return f"{float(value):.2f}"
+
+
+def _build_osv_vulnerability_url(vuln_id: object) -> str:
+    return f"https://osv.dev/vulnerability/{vuln_id}"
+
+
+def _legend_item(component_id: str, label: str, swatch_kind: str) -> html.Div:
+    return html.Div(
+        id=component_id,
+        className="graph-legend-item",
+        children=[
+            html.Span(
+                className=f"graph-legend-swatch graph-legend-swatch-{swatch_kind}",
+            ),
+            html.Span(label, className="graph-legend-label"),
+        ],
+    )

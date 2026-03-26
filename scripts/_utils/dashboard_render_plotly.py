@@ -66,7 +66,7 @@ def render_visible_graph(
                 },
                 mode="markers",
                 name=f"Packages: {vuln_status}",
-                showlegend=True,
+                showlegend=False,
             )
         )
 
@@ -90,7 +90,7 @@ def render_visible_graph(
                 },
                 mode="markers+text",
                 name="Models",
-                showlegend=True,
+                showlegend=False,
                 text=[str(node.attrs["hf_model_id"]) for node in model_nodes],
                 textfont={
                     "color": theme.palette.graph_canvas_text,
@@ -140,22 +140,10 @@ def render_visible_graph(
             "family": theme.typography.font_ui,
         },
         hovermode="closest",
-        legend={
-            "bgcolor": theme.palette.graph_legend_background,
-            "bordercolor": theme.palette.graph_legend_border,
-            "borderwidth": 1,
-            "font": {
-                "color": theme.palette.graph_canvas_text,
-                "family": theme.typography.font_ui,
-                "size": 11,
-            },
-            "orientation": "h",
-            "x": 0.0,
-            "y": 1.02,
-        },
         margin={"b": 16, "l": 16, "r": 16, "t": 16},
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor=theme.palette.graph_canvas_background,
+        showlegend=False,
         uirevision="atlas-dashboard-v1",
         xaxis={"showgrid": False, "showticklabels": False, "zeroline": False},
         yaxis={"showgrid": False, "showticklabels": False, "zeroline": False},
@@ -164,7 +152,10 @@ def render_visible_graph(
     if not visible_graph.nodes:
         figure.add_annotation(
             showarrow=False,
-            text="No nodes match the current search and filters.",
+            text=(
+                "<b>No nodes match the current search and filters.</b><br>"
+                "Broaden the query or re-enable filters to restore context."
+            ),
             x=0.5,
             xref="paper",
             y=0.5,

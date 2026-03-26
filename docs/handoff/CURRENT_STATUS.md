@@ -5,17 +5,19 @@
 
 ## Current focus
 
-Dashboard Redesign Stage 2 is now in progress. The current shell keeps the graph-first structure from Stage 1, but the active refinement direction is now **no visible logo in the UI** plus better supporting-panel placement beneath the graph.
+Dashboard Redesign Stage 2 is complete. The current dashboard now keeps the no-logo graph-first shell from Stage 1 while adding a compact in-shell legend, clearer Stage 2 surface polish, and clickable OSV advisory links in the package inspector.
 
 ## Completed in current focus
 
-- Completed follow-up shell refinements within active T-031:
-  - removed the bundled `assets/branding/ai_supply_chain_risk_atlas_logo.png` asset from the repo so the default dashboard presentation is clearly no-logo
-  - updated `scripts/_utils/dashboard_layout.py` so the left rail stays focused on search and filters while `Snapshot Metrics` and `Reuse Hotspots` now live beneath the graph in the main pane
-  - removed user-facing `model_id` references from the search copy, model inspector rows, and model hover content so the dashboard presents Hugging Face model names only
-  - updated `assets/dashboard.css` to support the new bottom-of-dashboard insights row without changing dashboard semantics
-  - extended dashboard layout tests so the metrics and hotspots panels are asserted under the main pane rather than the left sidebar
-  - updated `assets/branding/README.md`, `docs/specs/dashboard-showcase.md`, and `docs/specs/_INDEX.md` to match the no-logo direction and lower insight-row layout
+- Completed T-031, Dashboard Redesign Stage 2: branding pass and visual refinement
+- Updated `scripts/_utils/dashboard_layout.py` so the graph pane now includes a compact custom legend, clearer supporting microcopy, refined badge treatment, and package-inspector vulnerability IDs that open `https://osv.dev/vulnerability/<ID>` in a new tab
+- Applied a follow-up shell tweak so the dashboard no longer shows the extra top-bar or above-graph explainer copy, and the graph legend now sits inline to the left of the scope/selection chips rather than stacking above them
+- Applied a second follow-up shell tweak so the graph panel header now uses two compact full-width rows: a horizontal status row and a compressed horizontal legend strip, allowing the graph canvas to start higher in the panel
+- Applied a third follow-up shell tweak so the four app-state metadata chips now live in a compact header ribbon beneath the title, while the graph legend is docked directly onto the graph frame as a compact overlay instead of occupying standalone panel height
+- Updated `scripts/_utils/dashboard_render_plotly.py` so the Plotly-native legend is disabled in favor of the new shell-level legend, while the light-canvas renderer semantics remain unchanged
+- Updated `assets/dashboard.css` with Stage 2 polish for top-bar badge tones, legend styling, control microcopy, empty-state treatment, and interactive advisory-link chips
+- Extended dashboard tests so the layout and integration suite assert the new legend contract and the unit suite verifies OSV advisory link generation
+- Updated `docs/specs/dashboard-showcase.md` and `docs/specs/_INDEX.md` so the dashboard contract now explicitly requires external OSV advisory links in the package inspector
 - Live artifact baseline remains unchanged:
   - `graphs/global.graphml` still contains **289 nodes** and **322** `uses_package` edges
   - the dashboard corpus remains **13 models** and **276 packages**
@@ -25,38 +27,41 @@ Dashboard Redesign Stage 2 is now in progress. The current shell keeps the graph
 
 - `python scripts/run_dashboard.py --help`: **exits 0** when run with the repo’s configured conda interpreter
 - Dashboard-focused regression slice:
-  - `/Applications/MiniConda/miniconda3/envs/ai-supply-chain-risk-atlas/bin/python -m pytest -q tests/unit/test_dashboard_layout.py tests/unit/test_dashboard_theme.py tests/unit/test_dashboard_render_plotly.py tests/integration/test_run_dashboard.py`
-  - **9 passed**
-- `make test`: **133 passed, 0 failures**
+  - `/Applications/MiniConda/miniconda3/envs/ai-supply-chain-risk-atlas/bin/python -m pytest -q tests/unit/test_dashboard_layout.py tests/unit/test_dashboard_render_plotly.py tests/integration/test_run_dashboard.py`
+  - **8 passed**
+- `make test`: **134 passed, 0 failures**
 - Dashboard runtime verification:
-  - `make dashboard` launched successfully against the live repo artifacts on `127.0.0.1:8050` and was then manually interrupted after the Dash startup banner confirmed the shell booted cleanly
+  - `make dashboard` reached the Dash startup banner on `127.0.0.1:8050` and then hit the expected local port-conflict failure because port `8050` was already occupied
+  - `/Applications/MiniConda/miniconda3/envs/ai-supply-chain-risk-atlas/bin/python scripts/run_dashboard.py --graph graphs/global.graphml --summary reports/summary.json --table reports/summary.csv --host 127.0.0.1 --port 8060` launched successfully against the live artifacts and was then manually interrupted after the startup banner confirmed the app booted cleanly
 
 ## Known gaps/blockers
 
-- Stage 2 through Stage 6 remain to be implemented one batch at a time
-- Stage 2 still needs legend polish, badge refinement, and better empty-state finish work
+- Stage 3 through Stage 6 remain to be implemented one batch at a time
+- Stage 3 still needs the renderer migration from Plotly to Cytoscape, including any required dependency/spec updates for that new renderer
 - The report scaffold is still not locally compiled because no TeX toolchain is installed in this environment
 
 ## Active coordination notes
 
-- The Stage 1 shell remains the baseline:
+- Stage 2 is complete; the next dashboard batch should focus only on Stage 3 Cytoscape migration
+- Keep the graph-first shell intact:
   - top bar
   - left sidebar
   - center graph pane
   - right inspector
-- Supporting context panels now belong beneath the graph, not in the left sidebar
-- The current design direction is to omit a visible logo from the dashboard UI; rely on color/typography/layout branding instead
-- The dashboard should present Hugging Face model names as the only user-facing model identifier; internal `model_id` values remain implementation details
-- Stage 2 should focus primarily on `scripts/_utils/dashboard_layout.py`, `scripts/_utils/dashboard_theme.py`, and `assets/dashboard.css`, with only small Plotly tweaks if the light-canvas presentation needs them
-- `assets/branding/` remains a reserved optional asset path, but the current default experience should not assume an asset is present
-- Plotly remains the renderer through Stages 0-2; Cytoscape is still deferred to Stage 3
-- Inspector behavior is still single-node only; compare mode remains out of scope
-- Dashboard semantics and the M1-M4 artifact contract remain unchanged
-- No `PROJECT_CHECKLIST.md` milestone or gate state changed in this follow-up batch
+- Keep the lower insight row beneath the graph; do not move those panels back into the left sidebar
+- Keep the no-logo default intact; rely on color, typography, spacing, and the new legend treatment instead
+- Keep the slimmer top-of-graph presentation intact; do not reintroduce the removed explainer copy above the graph or beneath the title bar unless requirements change
+- Keep the graph header as two compact horizontal rows rather than returning to tall legend cards or stacked status-card layouts
+- Keep high-level app-state metadata in the header ribbon, not inside the graph panel, and keep the legend visually attached to the graph frame as a compact overlay
+- Keep Hugging Face model names as the only user-facing model identifier; internal `model_id` values remain hidden implementation details
+- Keep the new external OSV-link behavior in the package inspector; do not add local advisory-description storage unless the spec changes
+- Keep Plotly out of new feature work unless it is needed as a migration fallback seam; Cytoscape is the next intended renderer
+- Preserve single-node inspector behavior; compare mode remains out of scope
+- `PROJECT_CHECKLIST.md` milestone gates remain unchanged, but the optional showcase-track redesign readiness has advanced to Stage 3
 
 ## Next task (single target)
 
-Finish Dashboard Redesign Stage 2: branding pass and visual refinement. See `NEXT_TASK.md` for the remaining Stage 2 brief and `docs/dashboard_redesign_plan.md` for the redesign acceptance criteria.
+Begin Dashboard Redesign Stage 3: Cytoscape migration. See `NEXT_TASK.md` for the implementation brief and `docs/dashboard_redesign_plan.md` for the Stage 3 acceptance criteria.
 
 ## Definition of done for next task
 
