@@ -5,90 +5,64 @@
 
 ## Current focus
 
-The optional local dashboard showcase is implemented and verified, and the redesign direction is now locked in `docs/dashboard_redesign_plan.md`. The next engineering batch is no longer a vague Plotly-vs-Cytoscape evaluation; it is **Dashboard Redesign Stage 0: audit and refactor preparation**, with Plotly retained for now and Cytoscape deferred to a later stage.
+Dashboard Redesign Stage 0 is complete. The next engineering batch is now **Dashboard Redesign Stage 1: new app shell, layout, and theme**, using the new layout/theme/controller seams added in this batch.
 
 ## Completed in current focus
 
-- Completed T-024, T-025, T-026, and T-028:
-  - added dashboard runtime dependencies to `environment.yml`: `dash` and `plotly`
-  - implemented the swap-friendly dashboard stack:
-    - `scripts/run_dashboard.py`
-    - `scripts/_utils/dashboard_data.py`
-    - `scripts/_utils/dashboard_view.py`
-    - `scripts/_utils/dashboard_render_plotly.py`
-    - `scripts/_utils/dashboard_app.py`
-    - `assets/dashboard.css`
-  - added dashboard tests:
-    - `tests/dashboard_fixtures.py`
-    - `tests/unit/test_dashboard_data.py`
-    - `tests/unit/test_dashboard_view.py`
-    - `tests/unit/test_dashboard_render_plotly.py`
-    - `tests/integration/test_run_dashboard.py`
-  - added `make dashboard` and extended `make validate` to include `python scripts/run_dashboard.py --help`
-  - updated `README.md` and `docs/specs/dashboard-showcase.md` to document the single-page Plotly dashboard, launch flow, and future renderer seam
-  - reviewed the live dashboard and replaced the old binary renderer decision path with a staged redesign roadmap in `docs/dashboard_redesign_plan.md`
-  - locked the redesign direction:
-    - graph-first application shell
-    - dark shell with light graph canvas
-    - single-node inspector workflow
-    - package labels hidden by default
-    - Plotly kept through Stages 0-2
-    - Cytoscape migration deferred to Stage 3
-    - implement one stage per batch only
-  - added a simple repo-local final report scaffold:
-    - `paper/final_report.tex`
-    - `paper/README.md`
-  - updated the repo layout notes in `README.md` so the new `paper/` directory is discoverable
-- Live dashboard/runtime baseline:
-  - dashboard startup reads the current live artifacts: `graphs/global.graphml`, `reports/summary.json`, `reports/summary.csv`
-  - the live graph contains **289 nodes** and **322** `uses_package` edges
-  - the explorer surfaces the current corpus of **13 models** and **276 packages**
+- Completed T-029:
+  - added dedicated dashboard theme and branding-path support in `scripts/_utils/dashboard_theme.py`
+  - added a renderer-agnostic controller in `scripts/_utils/dashboard_controller.py`
+  - split the Dash component tree into `scripts/_utils/dashboard_layout.py` so future shell work does not require callback rewiring
+  - reduced `scripts/_utils/dashboard_app.py` to a thin app factory/callback layer and wired Dash explicitly to the repo `assets/` directory
+  - updated `scripts/_utils/dashboard_render_plotly.py` and `assets/dashboard.css` to consume centralized theme tokens while preserving the current visual behavior
+  - scaffolded `assets/branding/README.md` with the default logo location `assets/branding/ai_supply_chain_risk_atlas_logo.png`
+  - documented the post-Stage-0 dashboard file responsibilities in `docs/dashboard_architecture_note.md`
+  - added Stage 0 regression coverage:
+    - `tests/unit/test_dashboard_theme.py`
+    - `tests/unit/test_dashboard_controller.py`
+    - updated `tests/integration/test_run_dashboard.py`
+  - updated `docs/handoff/QUICK_REFERENCE.md` so fresh agents can route directly to the new dashboard files
+- Live artifact baseline remains unchanged:
+  - `graphs/global.graphml` still contains **289 nodes** and **322** `uses_package` edges
+  - the dashboard corpus remains **13 models** and **276 packages**
   - the live summary still reports **21** reused vulnerable packages
 
 ## Passing checks
 
-- `python scripts/run_dashboard.py --help`: **exits 0**
-- `make test`: **128 passed, 0 failures**
-- `make validate`: **passes**
-- `make dashboard`: **launches successfully** on `http://127.0.0.1:8050` with the documented defaults when run outside the sandbox socket restriction; launch was manually interrupted after startup verification
-- Existing core checks remain healthy:
-  - `make all` passes from repo root
-  - `graphs/global.graphml`, `reports/summary.json`, and `reports/summary.csv` all exist
-  - both required PNG figures still exist under `figures/`
-  - no unresolved decision markers remain in active README/spec/handoff docs
-- Report-scaffold checks:
-  - `paper/final_report.tex` exists and is prefilled with project-specific content
-  - `paper/README.md` documents both repo-local editing and later Overleaf transfer
-  - `latexmk` and `pdflatex` are not installed in the current environment, so the LaTeX draft was not compiled locally
+- `python scripts/run_dashboard.py --help`: **exits 0** when run with the repo’s configured conda interpreter
+- Dashboard-focused regression suite:
+  - `python -m pytest -q tests/unit/test_dashboard_theme.py tests/unit/test_dashboard_controller.py tests/unit/test_dashboard_data.py tests/unit/test_dashboard_view.py tests/unit/test_dashboard_render_plotly.py tests/integration/test_run_dashboard.py`
+  - **17 passed**
+- `make test`: **131 passed, 0 failures**
+- Dashboard runtime verification:
+  - `make dashboard` reached the Dash startup banner against the live repo artifacts, then exited because local port `127.0.0.1:8050` was already occupied by another Python process on this workstation snapshot
+  - `python scripts/run_dashboard.py --graph graphs/global.graphml --summary reports/summary.json --table reports/summary.csv --host 127.0.0.1 --port 8060` launched successfully with elevated local bind permissions and was then manually interrupted
 
 ## Known gaps/blockers
 
-- No core project blockers remain
-- The redesign itself is not implemented yet; only the roadmap is locked
-- Stage 0 through Stage 6 remain to be completed one batch at a time
-- `make dashboard` needs a real local socket bind; in the sandbox it reaches startup and then requires elevated launch permissions to complete the bind
-- The report scaffold is ready for editing, but local PDF compilation was not verified because no TeX toolchain is installed in this environment
+- Stage 1 through Stage 6 remain to be implemented one batch at a time
+- The dashboard still uses the pre-redesign stacked prototype shell; this batch prepared structure but did not deliver the new graph-first layout
+- Port `8050` was already in use during this batch, so default-port launch verification could not be left running even though the app itself started successfully
+- The report scaffold is still not locally compiled because no TeX toolchain is installed in this environment
 
 ## Active coordination notes
 
-- The dashboard now uses an explicit data/view/render split so a future `dash-cytoscape` renderer can be added without rewriting artifact loading or filter/detail logic
-- `docs/specs/dashboard-showcase.md` is aligned with the implemented Plotly dashboard and the future renderer seam
-- `docs/dashboard_redesign_plan.md` is now the authoritative roadmap for all dashboard redesign work
-- Fresh agents should treat the redesign as a staged delivery:
-  - Stage 0: audit and refactor preparation
-  - Stage 1: new app shell, layout, and theme
-  - Stage 2: branding and visual refinement
-  - Stage 3: Cytoscape migration
-  - Stage 4: inspector redesign
-  - Stage 5: filters, search, and linked summaries
-  - Stage 6: final polish
-- `paper/final_report.tex` is intentionally a simple single-file LaTeX draft, modeled after the user's preferred style, so it can be copied into Overleaf later with minimal restructuring
-- No `PROJECT_CHECKLIST.md` milestone or gate state changed in this batch; this was a documentation/report-scaffold addition rather than a new pipeline milestone
-- The next agent should start with **T-029 / Stage 0 only** and avoid drifting into Stage 1 visual redesign in the same batch
+- Dashboard responsibilities are now intentionally split:
+  - `dashboard_data.py` for artifact loading and canonical state
+  - `dashboard_view.py` for pure filter/search/detail logic
+  - `dashboard_controller.py` for interaction-state orchestration
+  - `dashboard_layout.py` for Dash component structure
+  - `dashboard_render_plotly.py` for the current renderer
+  - `dashboard_theme.py` for theme tokens and branding asset paths
+- `assets/branding/` is now the reserved home for optional logo files; Stage 2 can experiment with placement without inventing a new path
+- Stage 1 should focus primarily on `scripts/_utils/dashboard_layout.py`, `scripts/_utils/dashboard_theme.py`, and `assets/dashboard.css`
+- Plotly remains the renderer through Stages 0-2; Cytoscape is still deferred to Stage 3
+- No core pipeline milestone gate changed in this batch; the progress was on the optional dashboard redesign track
+- No spec changed in this batch, so `docs/specs/_INDEX.md` did not need an update
 
 ## Next task (single target)
 
-Implement Dashboard Redesign Stage 0: audit and refactor preparation. See `NEXT_TASK.md` for the stage brief and `TASK_QUEUE.md` for the staged backlog.
+Implement Dashboard Redesign Stage 1: new app shell, layout, and theme. See `NEXT_TASK.md` for the Stage 1 brief and `docs/dashboard_architecture_note.md` for the new file-responsibility map.
 
 ## Definition of done for next task
 

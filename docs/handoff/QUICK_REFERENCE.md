@@ -118,9 +118,14 @@ Current dashboard code locations:
 
 - `scripts/run_dashboard.py`
 - `scripts/_utils/dashboard_data.py`
+- `scripts/_utils/dashboard_controller.py`
+- `scripts/_utils/dashboard_layout.py`
 - `scripts/_utils/dashboard_view.py`
 - `scripts/_utils/dashboard_render_plotly.py`
 - `scripts/_utils/dashboard_app.py`
+- `scripts/_utils/dashboard_theme.py`
 - `assets/dashboard.css`
+- `assets/branding/README.md`
+- `docs/dashboard_architecture_note.md`
 
 Full routing table with tags: `docs/specs/_INDEX.md`

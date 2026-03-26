@@ -94,6 +94,7 @@ Implement and verify the optional local dashboard as a read-only presentation la
 - Future dashboard redesign work is governed by `docs/dashboard_redesign_plan.md`.
 - Implement one redesign stage per batch; do not combine major stages.
 - Keep Plotly in place through Stages 0-2 and defer Cytoscape migration to Stage 3.
+- Stage 0 redesign preparation is complete: theme tokens, layout/controller seams, repo `assets/` wiring, and a reserved branding asset home now exist so Stage 1 can focus on the shell and theme work directly.
 
 ### M1: Ingestion and Eligibility Baseline
 
@@ -221,7 +222,9 @@ Validation status for this repository snapshot (`2026-03-26`):
 - Handoff continuity test:
   - passed; `CURRENT_STATUS.md` and `NEXT_TASK.md` were rewritten in the required format without introducing new policy assumptions.
 - Showcase dashboard test:
-  - passed; the Plotly dashboard launches locally, reads the live graph/report artifacts at startup, and the post-validation UI backlog is now organized into explicit redesign stages.
+  - passed; the Plotly dashboard still reads the live graph/report artifacts at startup after the Stage 0 refactor. In this workstation snapshot, `make dashboard` hit an external port-8050 conflict after the startup banner, so launch was additionally verified on `127.0.0.1:8060` with elevated local bind permissions.
+- Dashboard redesign preparation test:
+  - passed; `dashboard_theme.py`, `dashboard_controller.py`, `dashboard_layout.py`, and `assets/branding/` now provide the explicit seams and asset home expected by `docs/dashboard_redesign_plan.md` Stage 0.
 
 ## Handoff Obligations Per Batch
 

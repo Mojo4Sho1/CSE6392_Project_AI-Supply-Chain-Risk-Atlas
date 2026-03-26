@@ -7,16 +7,7 @@ from __future__ import annotations
 import plotly.graph_objects as go
 
 from scripts._utils.dashboard_data import DashboardNode, DashboardState, VisibleGraph
-
-_MODEL_COLOR = "#0f766e"
-_MODEL_OUTLINE = "#0b3f3a"
-_EDGE_COLOR = "rgba(15, 23, 42, 0.18)"
-_SELECTED_COLOR = "#f97316"
-_PACKAGE_COLORS = {
-    "not_vulnerable": "#22c55e",
-    "unknown": "#f59e0b",
-    "vulnerable": "#dc2626",
-}
+from scripts._utils.dashboard_theme import DEFAULT_DASHBOARD_THEME
 
 
 def render_visible_graph(
@@ -25,6 +16,7 @@ def render_visible_graph(
 ) -> go.Figure:
     """Render the visible graph using only canonical node/edge records."""
     del dashboard_state  # Renderer v1 only needs the canonical visible graph payload.
+    theme = DEFAULT_DASHBOARD_THEME
 
     figure = go.Figure()
     node_lookup = {node.node_id: node for node in visible_graph.nodes}
@@ -42,7 +34,7 @@ def render_visible_graph(
                 x=edge_x,
                 y=edge_y,
                 hoverinfo="skip",
-                line={"color": _EDGE_COLOR, "width": 1.0},
+                line={"color": theme.palette.graph_edge, "width": 1.0},
                 mode="lines",
                 name="uses_package",
                 showlegend=False,
@@ -67,7 +59,7 @@ def render_visible_graph(
                 customdata=[node.node_id for node in package_nodes],
                 hovertemplate=_package_hover_template(package_nodes),
                 marker={
-                    "color": _PACKAGE_COLORS[vuln_status],
+                    "color": _package_color(theme, vuln_status),
                     "line": {"color": "rgba(15,23,42,0.35)", "width": 1},
                     "opacity": 0.85,
                     "size": [_package_marker_size(node) for node in package_nodes],
@@ -87,8 +79,8 @@ def render_visible_graph(
                 customdata=[node.node_id for node in model_nodes],
                 hovertemplate=_model_hover_template(model_nodes),
                 marker={
-                    "color": _MODEL_COLOR,
-                    "line": {"color": _MODEL_OUTLINE, "width": 1.6},
+                    "color": theme.palette.accent_primary,
+                    "line": {"color": theme.palette.accent_primary_dark, "width": 1.6},
                     "opacity": [
                         0.95 if _model_has_visible_edge(node, visible_graph) else 0.45
                         for node in model_nodes
@@ -100,7 +92,11 @@ def render_visible_graph(
                 name="Models",
                 showlegend=True,
                 text=[str(node.attrs["hf_model_id"]) for node in model_nodes],
-                textfont={"color": "#0f172a", "family": "Avenir Next, Trebuchet MS, sans-serif", "size": 11},
+                textfont={
+                    "color": theme.palette.text_primary,
+                    "family": theme.typography.font_ui,
+                    "size": 11,
+                },
                 textposition="top center",
             )
         )
@@ -118,8 +114,8 @@ def render_visible_graph(
                 customdata=[selected_node.node_id],
                 hoverinfo="skip",
                 marker={
-                    "color": _SELECTED_COLOR,
-                    "line": {"color": "#7c2d12", "width": 2},
+                    "color": theme.palette.selected_fill,
+                    "line": {"color": theme.palette.selected_outline, "width": 2},
                     "size": 26 if selected_node.node_type == "Model" else 22,
                     "symbol": "circle-open-dot",
                 },
@@ -127,7 +123,11 @@ def render_visible_graph(
                 name="Selected",
                 showlegend=False,
                 text=[selected_node.label],
-                textfont={"color": "#9a3412", "family": "Avenir Next, Trebuchet MS, sans-serif", "size": 12},
+                textfont={
+                    "color": "#9a3412",
+                    "family": theme.typography.font_ui,
+                    "size": 12,
+                },
                 textposition="bottom center",
             )
         )
@@ -137,8 +137,8 @@ def render_visible_graph(
         dragmode="pan",
         hovermode="closest",
         legend={
-            "bgcolor": "rgba(255,255,255,0.78)",
-            "bordercolor": "rgba(15,23,42,0.08)",
+            "bgcolor": theme.palette.graph_legend_background,
+            "bordercolor": theme.palette.graph_legend_border,
             "borderwidth": 1,
             "orientation": "h",
             "x": 0.0,
@@ -146,7 +146,7 @@ def render_visible_graph(
         },
         margin={"b": 16, "l": 16, "r": 16, "t": 16},
         paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(255,255,255,0.9)",
+        plot_bgcolor=theme.palette.graph_canvas_background,
         uirevision="atlas-dashboard-v1",
         xaxis={"showgrid": False, "showticklabels": False, "zeroline": False},
         yaxis={"showgrid": False, "showticklabels": False, "zeroline": False},
@@ -160,10 +160,22 @@ def render_visible_graph(
             xref="paper",
             y=0.5,
             yref="paper",
-            font={"color": "#475569", "family": "Avenir Next, Trebuchet MS, sans-serif", "size": 14},
+            font={
+                "color": "#475569",
+                "family": theme.typography.font_ui,
+                "size": 14,
+            },
         )
 
     return figure
+
+
+def _package_color(theme, vuln_status: str) -> str:
+    if vuln_status == "vulnerable":
+        return theme.palette.vulnerable
+    if vuln_status == "unknown":
+        return theme.palette.unknown
+    return theme.palette.not_vulnerable
 
 
 def _package_marker_size(node: DashboardNode) -> int:

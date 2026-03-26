@@ -61,8 +61,10 @@ class TestRunDashboardIntegration:
         assert run(args, serve=False) == 2
 
     def test_startup_succeeds_and_app_layout_contains_required_sections(self, tmp_path):
-        from scripts._utils.dashboard_app import build_app, compute_dashboard_outputs
+        from scripts._utils.dashboard_app import build_app
+        from scripts._utils.dashboard_controller import compute_dashboard_outputs
         from scripts._utils.dashboard_data import load_dashboard_state
+        from scripts._utils.dashboard_theme import DASHBOARD_ASSETS_DIR
         from scripts.run_dashboard import run
 
         graph_path, summary_path, table_path = write_dashboard_artifacts(tmp_path)
@@ -74,6 +76,7 @@ class TestRunDashboardIntegration:
         app = build_app(state)
         component_ids = _collect_component_ids(app.layout)
 
+        assert Path(app.config.assets_folder) == DASHBOARD_ASSETS_DIR
         assert {
             "search-input",
             "node-type-filter",
@@ -86,7 +89,7 @@ class TestRunDashboardIntegration:
             "selected-node-store",
         }.issubset(component_ids)
 
-        figure, detail_panel, selected_node_id, status_text = compute_dashboard_outputs(
+        outputs = compute_dashboard_outputs(
             state,
             search_text="shared-lib",
             node_types=["Model", "Package"],
@@ -97,10 +100,10 @@ class TestRunDashboardIntegration:
             click_data={"points": [{"customdata": "model::example--model-a--11111111"}]},
         )
 
-        assert len(figure.data) >= 2
-        assert selected_node_id == "model::example--model-a--11111111"
-        assert "Visible graph" in status_text
-        assert getattr(detail_panel, "children", None) is not None
+        assert len(outputs.figure.data) >= 2
+        assert outputs.detail_payload["kind"] == "model"
+        assert outputs.selected_node_id == "model::example--model-a--11111111"
+        assert "Visible graph" in outputs.status_text
 
         args = argparse.Namespace(
             graph=str(graph_path),
