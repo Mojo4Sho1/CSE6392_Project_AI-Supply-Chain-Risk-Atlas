@@ -1,6 +1,6 @@
 # Project Checklist
 
-**Last updated:** 2026-03-24  
+**Last updated:** 2026-03-26  
 **Owner:** Joe + Codex
 
 ## Purpose
@@ -63,6 +63,32 @@ Validate the completed M1-M4 pipeline end-to-end from the repository root and re
 - [x] No stale `models.json` references remain in active README/spec/handoff docs.
 - [x] README, specs, and handoff docs express one artifact-only ingestion policy and one required v1 graph edge policy (`uses_package`, with `depends_on` deferred).
 - [x] The post-validation backlog is narrowed to the optional dashboard showcase track.
+
+### Phase 5B: Showcase Dashboard
+
+**Objective**  
+Implement and verify the optional local dashboard as a read-only presentation layer over the completed M1-M4 artifacts.
+
+**Required inputs**
+- `graphs/global.graphml`
+- `reports/summary.json`
+- `reports/summary.csv`
+- `docs/specs/dashboard-showcase.md`
+- `environment.yml`
+
+**Checklist**
+- [x] Add the dashboard runtime dependencies to `environment.yml`.
+- [x] Implement the dashboard data/view/render/app split with a Plotly renderer seam.
+- [x] Add `scripts/run_dashboard.py` and `make dashboard`.
+- [x] Add automated tests for dashboard loaders, view logic, renderer behavior, and startup.
+- [x] Update README/spec/handoff docs for the local dashboard launch flow and future renderer seam.
+
+**Acceptance gate**
+- [x] `python scripts/run_dashboard.py --help` exits 0.
+- [x] `make test` passes after the dashboard additions.
+- [x] `make validate` passes after the dashboard additions.
+- [x] `make dashboard` launches locally on `127.0.0.1:8050` with the documented defaults.
+- [x] The renderer seam is explicit enough that a future Cytoscape renderer can reuse the same data/view-model layer.
 
 ### M1: Ingestion and Eligibility Baseline
 
@@ -175,7 +201,7 @@ Produce baseline metrics/rankings and final report artifacts from the graph.
 
 ## Cross-Phase Verification Suite
 
-Validation status for this repository snapshot (`2026-03-24`):
+Validation status for this repository snapshot (`2026-03-26`):
 
 - Routing test:
   - passed; the required read order plus rewritten handoff files point cleanly to the dashboard showcase track.
@@ -189,6 +215,8 @@ Validation status for this repository snapshot (`2026-03-24`):
   - passed after removing stale `data/models.json` references and reconciling README/spec routing with the implemented artifact-only M1-M4 pipeline.
 - Handoff continuity test:
   - passed; `CURRENT_STATUS.md` and `NEXT_TASK.md` were rewritten in the required format without introducing new policy assumptions.
+- Showcase dashboard test:
+  - passed; the Plotly dashboard launches locally, reads the live graph/report artifacts at startup, and leaves only optional renderer evaluation work.
 
 ## Handoff Obligations Per Batch
 

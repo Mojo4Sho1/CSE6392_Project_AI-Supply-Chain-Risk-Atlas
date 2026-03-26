@@ -97,6 +97,8 @@ docs/
     CURRENT_STATUS.md          # current project status
     NEXT_TASK.md               # next concrete task batch
     PROJECT_CHECKLIST.md       # end-to-end milestone checklist and gates
+paper/
+  final_report.tex             # simple LaTeX draft for the final write-up / Overleaf handoff
 ```
 
 ---
@@ -195,14 +197,32 @@ make scan
 make graph
 make report
 make all
+make dashboard
 make validate
 ```
 
 Command notes:
 
 - `make all` executes the full M1-M4 stage chain through reporting and may reuse already-generated stage outputs.
+- `make dashboard` launches the local read-only Dash + Plotly showcase against `graphs/global.graphml`, `reports/summary.json`, and `reports/summary.csv`.
 - `make validate` runs the Phase 5 local validation bundle: CLI smoke checks, `make all`, `make test`, artifact existence checks, and the unresolved-decision grep from `docs/specs/testing-and-validation.md`.
 - Use `make clean` before `make all` only when you intentionally want to regenerate all pipeline outputs from scratch.
+
+## Local Dashboard
+
+The optional showcase layer is a single-page Dash app with a Plotly-based graph explorer.
+
+Launch it from repo root with:
+
+```bash
+make dashboard
+```
+
+Behavior notes:
+
+- it reads the existing graph/report artifacts once at startup and does not regenerate pipeline outputs
+- the explorer is intentionally renderer-separated so a future Cytoscape swap can reuse the same data/view-model logic
+- the current v1 renderer is Plotly-only; `dash-cytoscape` is intentionally deferred
 
 ---
 
@@ -312,13 +332,18 @@ This policy should remain consistent across all models in the dataset.
 - Generate final figures / atlas visuals
 - Produce `reports/summary.(json|csv)`
 
+### M5 — Local showcase dashboard
+- Launch the single-page Dash + Plotly explorer with `make dashboard`
+- Browse overview metrics, the typed graph, and model/package detail panels without mutating pipeline artifacts
+
 ---
 
 ## Tooling (minimal stack)
 
 - Hugging Face API / metadata
 - **OSV-Scanner**
-- Python + NetworkX (+ plotting library)
+- Python + NetworkX
+- Dash + Plotly for the local showcase dashboard
 
 ---
 

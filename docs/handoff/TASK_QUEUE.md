@@ -1,6 +1,6 @@
 # Task Queue
 
-**Last updated:** 2026-03-24
+**Last updated:** 2026-03-26
 **Owner:** Joe
 
 ## Purpose
@@ -71,5 +71,8 @@ Prioritized backlog of discrete, agent-executable tasks. After completing assign
 | T-021 | done | Full pipeline validation (`make all`) | `PROJECT_CHECKLIST.md` | All milestone gates pass; cross-phase verification suite passes |
 | T-022 | done | Final documentation pass | All handoff + spec docs | All docs current; no stale references; README accurate |
 | T-023 | done | Draft dashboard showcase spec and route docs | `dashboard-showcase.md`, `_INDEX.md` | Dashboard spec exists; routing docs point future agents to it consistently |
-| T-024 | active | Implement local Dash/Plotly dashboard + tests | `dashboard-showcase.md`, `graph-semantics-and-metrics.md`, `artifact-schemas.md` | Local dashboard loads graph/report artifacts, supports required search/filters/details, and test coverage exists |
-| T-025 | queued | Add `make dashboard` target and demo instructions | `dashboard-showcase.md`, `AGENTS.md` | `make dashboard` launches the local app with documented defaults |
+| T-024 | done | Implement local Dash/Plotly dashboard + tests | `dashboard-showcase.md`, `graph-semantics-and-metrics.md`, `artifact-schemas.md` | Local dashboard loads graph/report artifacts, supports required search/filters/details, and test coverage exists |
+| T-025 | done | Add `make dashboard` target and demo instructions | `dashboard-showcase.md`, `AGENTS.md` | `make dashboard` launches the local app with documented defaults |
+| T-028 | done | Create simple LaTeX final report scaffold | `README.md`, `CURRENT_STATUS.md` | `paper/final_report.tex` exists with project-specific starter content and `paper/README.md` explains local/Overleaf usage |
+| T-026 | active | Evaluate live dashboard UX and decide on Cytoscape follow-on | `dashboard-showcase.md`, `CURRENT_STATUS.md` | A written recommendation explicitly says either keep Plotly as-is or proceed to Cytoscape, with rationale grounded in the live dashboard behavior |
+| T-027 | blocked | If approved, implement an optional Cytoscape renderer on the existing seam | `dashboard-showcase.md`, `AGENTS.md` | Cytoscape renderer reuses the dashboard data/view layer and preserves CLI/Make semantics |

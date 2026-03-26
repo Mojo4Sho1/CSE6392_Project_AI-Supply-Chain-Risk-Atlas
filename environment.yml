@@ -8,6 +8,8 @@ dependencies:
   - networkx
   - matplotlib
   - seaborn
+  - dash
+  - plotly
   - requests
   - pyyaml
   - jupyterlab

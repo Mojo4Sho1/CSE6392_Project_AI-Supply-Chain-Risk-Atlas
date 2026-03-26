@@ -1,64 +1,75 @@
 # Current Status
 
-**Last updated:** 2026-03-24
+**Last updated:** 2026-03-26
 **Owner:** Joe
 
 ## Current focus
 
-Phase 5 validation and documentation are complete. The core M1-M4 pipeline is validated and documented; the only remaining queued work is the optional local dashboard showcase track.
+The optional local dashboard showcase is implemented and verified, and the next major product-facing question is still whether the current Plotly renderer is good enough to keep. In parallel, the repo now also contains a simple LaTeX report scaffold so the final write-up can be drafted in-repo before moving to Overleaf.
 
 ## Completed in current focus
 
-- Completed T-021 through T-023:
-  - ran the full Phase 5 local validation pass against the implemented M1-M4 pipeline and recorded the outcomes in `docs/handoff/PROJECT_CHECKLIST.md`
-  - added `make validate` to bundle the repeated validation workflow: CLI `--help` smoke checks, `make all`, `make test`, artifact existence checks, and the unresolved-decision grep
-  - reconciled `README.md`, `docs/specs/artifact-schemas.md`, and `docs/specs/_INDEX.md` with the actual v1 pipeline by removing stale `data/models.json` references and documenting the manifest-based freeze boundary
-  - refreshed dashboard routing docs so the next agent can go straight to `docs/specs/dashboard-showcase.md`
-- Current live artifact baseline:
-  - **13** manifest files under `manifests/<model_id>/manifest_index.json`
-  - **13** paired OSV raw outputs and **13** normalized outputs
-  - `graphs/global.graphml`
-  - `reports/summary.json`
-  - `reports/summary.csv`
-  - `figures/reused_vulnerable_packages.png`
-  - `figures/impacted_model_count_distribution.png`
-- Current live report baseline from `graphs/global.graphml` / `reports/summary.json`:
-  - **13 models** in `per_model_metrics`
-  - **276 unique packages**
-  - average packages per model: **24.76923076923077**
-  - average direct packages per model: **10.692307692307692**
-  - average transitive packages per model: **14.076923076923077**
-  - **21** `reused_vulnerable_packages` entries in the current summary output
+- Completed T-024 through T-025 and T-028:
+  - added dashboard runtime dependencies to `environment.yml`: `dash` and `plotly`
+  - implemented the swap-friendly dashboard stack:
+    - `scripts/run_dashboard.py`
+    - `scripts/_utils/dashboard_data.py`
+    - `scripts/_utils/dashboard_view.py`
+    - `scripts/_utils/dashboard_render_plotly.py`
+    - `scripts/_utils/dashboard_app.py`
+    - `assets/dashboard.css`
+  - added dashboard tests:
+    - `tests/dashboard_fixtures.py`
+    - `tests/unit/test_dashboard_data.py`
+    - `tests/unit/test_dashboard_view.py`
+    - `tests/unit/test_dashboard_render_plotly.py`
+    - `tests/integration/test_run_dashboard.py`
+  - added `make dashboard` and extended `make validate` to include `python scripts/run_dashboard.py --help`
+  - updated `README.md` and `docs/specs/dashboard-showcase.md` to document the single-page Plotly dashboard, launch flow, and future renderer seam
+  - added a simple repo-local final report scaffold:
+    - `paper/final_report.tex`
+    - `paper/README.md`
+  - updated the repo layout notes in `README.md` so the new `paper/` directory is discoverable
+- Live dashboard/runtime baseline:
+  - dashboard startup reads the current live artifacts: `graphs/global.graphml`, `reports/summary.json`, `reports/summary.csv`
+  - the live graph contains **289 nodes** and **322** `uses_package` edges
+  - the explorer surfaces the current corpus of **13 models** and **276 packages**
+  - the live summary still reports **21** reused vulnerable packages
 
 ## Passing checks
 
-- `python scripts/ingest_repo_artifacts.py --help`: **exits 0**
-- `python scripts/run_osv_scan.py --help`: **exits 0**
-- `python scripts/build_risk_graph.py --help`: **exits 0**
-- `python scripts/generate_atlas_reports.py --help`: **exits 0**
-- `make all`: **passes** from repo root (current run reused staged outputs; no failures)
-- `make test`: **114 passed, 0 failures**
+- `python scripts/run_dashboard.py --help`: **exits 0**
+- `make test`: **128 passed, 0 failures**
 - `make validate`: **passes**
-- Output contract spot checks:
-  - `reports/summary.json` contains the required top-level fields: `schema_version`, `generated_at_utc`, `snapshot_timestamp_utc`, `graph_source`, `global_metrics`, `per_model_metrics`, `reused_vulnerable_packages`
-  - `reports/summary.csv` contains **13** data rows plus header, with the required six columns in the correct order
-  - both required PNG figures exist under `figures/`
+- `make dashboard`: **launches successfully** on `http://127.0.0.1:8050` with the documented defaults when run outside the sandbox socket restriction; launch was manually interrupted after startup verification
+- Existing core checks remain healthy:
+  - `make all` passes from repo root
+  - `graphs/global.graphml`, `reports/summary.json`, and `reports/summary.csv` all exist
+  - both required PNG figures still exist under `figures/`
   - no unresolved decision markers remain in active README/spec/handoff docs
+- Report-scaffold checks:
+  - `paper/final_report.tex` exists and is prefilled with project-specific content
+  - `paper/README.md` documents both repo-local editing and later Overleaf transfer
+  - `latexmk` and `pdflatex` are not installed in the current environment, so the LaTeX draft was not compiled locally
 
 ## Known gaps/blockers
 
-- The local Dash/Plotly showcase is not implemented yet; no `scripts/run_dashboard.py` entrypoint or `make dashboard` target exists
-- `make all` still reuses staged outputs by design; use `make clean` before `make all` only when intentionally testing a full regeneration from scratch
+- No core project blockers remain
+- The only open question is optional: whether the current Plotly renderer is visually strong enough, or whether a Cytoscape follow-on would materially improve the demo
+- `make dashboard` needs a real local socket bind; in the sandbox it reaches startup and then requires elevated launch permissions to complete the bind
+- The report scaffold is ready for editing, but local PDF compilation was not verified because no TeX toolchain is installed in this environment
 
 ## Active coordination notes
 
-- `docs/handoff/PROJECT_CHECKLIST.md` now records the Phase 5 validation state and cross-phase verification outcomes for the current repository snapshot
-- `docs/specs/dashboard-showcase.md` is the authoritative contract for the remaining showcase work
-- The next agent should start with T-024 and T-025: implement the read-only dashboard against the existing graph/report artifacts, then add the launch target and README instructions
+- The dashboard now uses an explicit data/view/render split so a future `dash-cytoscape` renderer can be added without rewriting artifact loading or filter/detail logic
+- `docs/specs/dashboard-showcase.md` is aligned with the implemented Plotly dashboard and the future renderer seam
+- `paper/final_report.tex` is intentionally a simple single-file LaTeX draft, modeled after the user's preferred style, so it can be copied into Overleaf later with minimal restructuring
+- No `PROJECT_CHECKLIST.md` milestone or gate state changed in this batch; this was a documentation/report-scaffold addition rather than a new pipeline milestone
+- The next agent should start with T-026: review the live Plotly dashboard and make an explicit keep-vs-Cytoscape recommendation before opening a renderer migration batch
 
 ## Next task (single target)
 
-Implement the optional local dashboard showcase track. See `NEXT_TASK.md` for the current brief and `TASK_QUEUE.md` for the remaining backlog.
+Evaluate the live dashboard UX and decide whether the project should keep the current Plotly renderer or open an optional Cytoscape follow-on. See `NEXT_TASK.md` for the current brief and `TASK_QUEUE.md` for the backlog.
 
 ## Definition of done for next task
 

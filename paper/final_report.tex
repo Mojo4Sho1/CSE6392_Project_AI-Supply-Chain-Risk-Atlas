@@ -1,0 +1,126 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{setspace}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{siunitx}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{float}
+\usepackage{xurl}
+\usepackage{hyperref}
+
+\graphicspath{{../figures/}}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  citecolor=blue,
+  urlcolor=blue,
+  breaklinks=true
+}
+
+\setstretch{1.08}
+\urlstyle{same}
+\setlength{\emergencystretch}{2em}
+
+\newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
+
+\title{\textbf{AI Supply Chain Risk Atlas:\\Design, Implementation, and Initial Findings}}
+\author{Joe Caldwell}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section*{Project Link}
+\textbf{Source code (GitHub):}
+
+\url{https://github.com/Mojo4Sho1/CSE6392_Project_AI-Supply-Chain-Risk-Atlas}
+
+\section{Introduction}
+This project studies software supply chain risk in open-source AI model repositories. The goal is to move from isolated per-repository dependency lists to a shared atlas that shows where vulnerable packages appear, which models reuse them, and how much dependency exposure each model carries. The implemented pipeline takes a curated set of Hugging Face models, collects dependency artifacts from their public source repositories, scans those artifacts for known vulnerabilities, and builds a typed graph that makes shared-package risk visible across the sample.
+
+The project intentionally emphasizes interpretable outputs instead of collapsing the analysis into a single opaque risk score. Each stage produces concrete artifacts that can be inspected independently: per-model manifests, raw and normalized vulnerability outputs, a global graph, summary reports, generated figures, and a local dashboard for interactive exploration. This report summarizes the design, current implementation, and initial findings from the validated repository snapshot.
+
+\section{System Overview}
+
+\subsection{Pipeline Stages}
+The repository is organized as a reproducible four-stage pipeline followed by reporting and optional local visualization. Table~\ref{tab:pipeline-outputs} summarizes the main stages and their primary outputs.
+
+\begin{table}[H]
+\centering
+\caption{Pipeline stages and primary outputs.}
+\label{tab:pipeline-outputs}
+\begin{tabular}{p{0.16\linewidth} p{0.30\linewidth} p{0.47\linewidth}}
+\toprule
+\textbf{Stage} & \textbf{Primary output} & \textbf{Purpose} \\
+\midrule
+M1 Ingest & \texttt{manifests/MODEL\_ID/manifest\_index.json} & Freeze candidate metadata, artifact discovery, and eligibility outcomes. \\
+M2 Scan & \texttt{osv/MODEL\_ID/raw.json}, \texttt{normalized.json} & Capture scanner output and normalize vulnerability findings into a stable schema. \\
+M3 Graph & \texttt{graphs/global.graphml} & Build the typed atlas graph over models and dependency packages. \\
+M4 Report & \texttt{reports/summary.json}, \texttt{summary.csv}, \texttt{figures/} & Compute aggregate metrics, per-model metrics, and reusable visual outputs. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Graph Representation}
+The atlas graph uses two node types: \texttt{Model} and \texttt{Package}. A model node represents a selected Hugging Face model repository, while a package node represents a deduplicated dependency identified by \texttt{(ecosystem, name, version)}. In the validated v1 design, the required graph edge is \texttt{uses\_package}, directed from a model to a package. Edges retain dependency-scope information when available (\texttt{direct}, \texttt{transitive}, or \texttt{unknown}), and package nodes retain vulnerability-related attributes such as severity bucket, fix availability, and vulnerability identifiers.
+
+\section{Methodology}
+
+\subsection{Dataset and Scope}
+The v1 dataset is a human-curated \texttt{data/models.csv} file containing selected Hugging Face models with public source repositories. The current validated repository snapshot includes 13 models that satisfy the project's visibility constraints. The project uses an artifact-only ingestion strategy: instead of cloning entire repositories, the pipeline fetches dependency manifests and lockfiles, records provenance, and evaluates eligibility from those artifacts.
+
+This scope keeps the workflow deterministic and reproducible, but it also imposes an important limitation: vulnerability findings are only as precise as the dependency evidence available in each repository. When versions are not pinned tightly enough to support vulnerability attribution, the normalized output records those packages with \texttt{vuln\_status=unknown} rather than over-claiming exposure.
+
+\subsection{Vulnerability Mapping and Reporting}
+Eligible dependency artifacts are scanned with OSV-Scanner, and the raw outputs are normalized into a stable schema for downstream graph construction. The report stage computes both per-model and aggregate metrics, including direct and transitive dependency counts, vulnerable dependency counts, reused vulnerable packages, and generated figures suitable for the final write-up. The same graph and report artifacts now also power a single-page local dashboard implemented with Dash and Plotly.
+
+\section{Results and Initial Findings}
+The current repository snapshot produces a graph with 289 total nodes and 322 \texttt{uses\_package} edges. These totals correspond to 13 model nodes and 276 package nodes. The global report indicates an average of 24.77 packages per model, split into 10.69 direct dependencies and 14.08 transitive dependencies.
+
+\begin{table}[H]
+\centering
+\caption{Key metrics from the current validated run.}
+\label{tab:key-metrics}
+\begin{tabular}{p{0.58\linewidth} p{0.22\linewidth}}
+\toprule
+\textbf{Metric} & \textbf{Value} \\
+\midrule
+Selected models analyzed & 13 \\
+Total graph nodes & 289 \\
+Total graph edges & 322 \\
+Unique package nodes & 276 \\
+Average packages per model & 24.77 \\
+Average direct packages per model & 10.69 \\
+Average transitive packages per model & 14.08 \\
+Reused vulnerable packages in summary report & 21 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+These results suggest that even a relatively small model sample already exhibits meaningful dependency reuse and non-trivial vulnerability exposure. Several repositories carry no currently flagged vulnerable packages in the validated outputs, while others show multiple vulnerable direct or transitive dependencies. This variability is one of the central reasons the graph view is helpful: it lets us compare model-level exposure while also revealing the shared dependency surface across the ecosystem.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.92\linewidth]{reused_vulnerable_packages.png}
+  \caption{Reused vulnerable packages reported by the current M4 pipeline outputs.}
+  \label{fig:reused-vuln-packages}
+\end{figure}
+
+\section{Dashboard and Future Work}
+The repository now includes an optional single-page local dashboard that reads \texttt{graphs/global.graphml}, \texttt{reports/summary.json}, and \texttt{reports/summary.csv} at startup and exposes the atlas as an interactive graph explorer. The dashboard is already useful for quick inspection, but it is still being evaluated from a presentation perspective. The current implementation uses Plotly and was intentionally structured with a renderer seam so that a future Cytoscape renderer could be added without rewriting the data-loading or filter/detail logic.
+
+\todo{After the final dashboard evaluation, update this section with a short summary of what worked well visually, what still felt weak, and whether the project should keep Plotly or move to Cytoscape.}
+
+\section{Conclusion}
+This project delivers a reproducible AI supply chain risk atlas pipeline over a curated sample of open-source Hugging Face model repositories. The implemented workflow freezes model intake, normalizes vulnerability data, builds a typed graph over model-package relationships, and generates summary artifacts that make dependency exposure easier to inspect and explain. The current outputs already support both static reporting and interactive exploration, and the remaining work is mostly presentation-oriented: refining the dashboard experience and tightening the final narrative for submission.
+
+\end{document}

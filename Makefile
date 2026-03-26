@@ -7,18 +7,27 @@ OSV_STAMP      := osv/.stage_complete
 GRAPH_FILE     := graphs/global.graphml
 REPORT_STAMP   := reports/.stage_complete
 
-.PHONY: test ingest scan graph report all validate clean
+.PHONY: test ingest scan graph report all dashboard validate clean
 
 test:
 	$(PYTHON) -m pytest -q
 
 all: report
 
+dashboard:
+	$(PYTHON) scripts/run_dashboard.py \
+	  --graph $(GRAPH_FILE) \
+	  --summary reports/summary.json \
+	  --table reports/summary.csv \
+	  --host 127.0.0.1 \
+	  --port 8050
+
 validate:
 	$(PYTHON) scripts/ingest_repo_artifacts.py --help >/dev/null
 	$(PYTHON) scripts/run_osv_scan.py --help >/dev/null
 	$(PYTHON) scripts/build_risk_graph.py --help >/dev/null
 	$(PYTHON) scripts/generate_atlas_reports.py --help >/dev/null
+	$(PYTHON) scripts/run_dashboard.py --help >/dev/null
 	$(MAKE) all
 	$(MAKE) test
 	test -f graphs/global.graphml

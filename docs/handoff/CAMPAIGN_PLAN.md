@@ -1,6 +1,6 @@
 # Campaign Plan
 
-**Last updated:** 2026-03-24
+**Last updated:** 2026-03-26
 **Owner:** Joe
 
 ## Purpose
@@ -79,7 +79,10 @@ Phased implementation roadmap for the AI Supply Chain Risk Atlas pipeline. Agent
 - [x] Final documentation pass (T-022)
 - [x] Ensure all handoff docs reflect final state (T-022)
 - [x] Draft dashboard showcase spec and route docs (T-023)
-- [ ] Implement local Dash/Plotly dashboard + tests (T-024)
-- [ ] Add `make dashboard` target and demo instructions (T-025)
+- [x] Implement local Dash/Plotly dashboard + tests (T-024)
+- [x] Add `make dashboard` target and demo instructions (T-025)
+- [x] Create simple LaTeX report scaffold for the final write-up (T-028)
+- [ ] Evaluate live dashboard UX and decide on Cytoscape follow-on (T-026)
+- [ ] Implement optional Cytoscape renderer if approved (T-027)
 
-**Gate:** All milestone gates pass. All docs current. Pipeline reproducible end-to-end. Optional showcase dashboard launches locally from the documented artifacts.
+**Gate:** All milestone gates pass. All docs current. Pipeline reproducible end-to-end. Optional showcase dashboard launches locally from the documented artifacts. Renderer upgrades remain elective.

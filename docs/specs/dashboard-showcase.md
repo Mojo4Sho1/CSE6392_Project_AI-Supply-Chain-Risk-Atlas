@@ -4,14 +4,16 @@
 
 Define the v1 local showcase dashboard for the AI Supply Chain Risk Atlas. This dashboard is a read-only presentation layer over the existing graph and report artifacts and is intended for local demo/class use rather than deployment.
 
-**Last updated:** 2026-03-24
+**Last updated:** 2026-03-26
 
 ## Status and scope
 
 - Delivery target: local-only v1 dashboard
 - Framework: Dash + Plotly
+- Layout model: single-page app with overview row, filter rail, graph explorer, and detail panel
 - Role in project: optional showcase layer after M4, not a required milestone pipeline output
 - Data policy: read-only consumer of pipeline artifacts; must not recompute or mutate M1-M4 outputs
+- Renderer policy: keep a renderer seam so a future Cytoscape renderer can reuse the same data/view-model layer
 
 ## Inputs
 
@@ -46,8 +48,11 @@ Operational rules:
 - bind only to the configured local host in v1
 - startup should load artifacts once and keep an in-memory app state for interaction
 - no authentication, multi-user state, or deployment configuration is required in v1
+- use a deterministic seeded static layout for the initial Plotly graph positioning
 
 ## Required app surfaces
+
+The v1 dashboard is a single-page app. These surfaces may appear as sections within that page rather than separate routes.
 
 ### 1) Overview page
 
@@ -117,6 +122,10 @@ Interaction defaults:
 - treat `graphs/global.graphml` as the source of truth for node/edge relationships
 - treat `reports/summary.json` and `reports/summary.csv` as the source of truth for precomputed M4 metrics/rankings
 - parse package vulnerability IDs from `vuln_ids_json` on package nodes because GraphML stores scalar attributes only
+- keep dashboard internals split into:
+  - a data layer that loads and normalizes artifacts
+  - a pure view-model layer for filtering/search/detail logic
+  - a renderer layer that turns the visible graph payload into Plotly traces
 - preserve the M3 node typing contract:
   - `node_type=Model`
   - `node_type=Package`
@@ -131,6 +140,7 @@ Interaction defaults:
 - editing graph data
 - adding new graph edge types
 - replacing the required M4 report artifacts
+- adding `dash-cytoscape` in the initial v1 implementation
 
 ## Testing and validation expectations
 
@@ -139,6 +149,8 @@ Implementation must include:
 - unit tests for graph/report loading and transformation into dashboard-ready structures
 - callback/state smoke tests for search, filters, and detail-panel selection
 - startup test against fixture graph/report artifacts
+- at least one test proving the view-model logic runs without importing Plotly
+- at least one renderer test proving the Plotly renderer consumes the canonical visible-graph payload without mutating it
 - `python scripts/run_dashboard.py --help` exits 0
 - `make dashboard` launches with the documented defaults
 
@@ -149,3 +161,4 @@ When the dashboard is implemented:
 - add a `make dashboard` target
 - document local launch instructions
 - keep the dashboard documented as a showcase/demo layer, not as a required milestone output
+- preserve a clean seam so a future `dashboard_render_cytoscape.py` can be added without rewriting the artifact-loading or filter/search logic
