@@ -17,6 +17,9 @@ def test_build_theme_css_variables_exposes_core_theme_tokens():
 
     assert css_vars["--atlas-accent-primary"] == DEFAULT_DASHBOARD_THEME.palette.accent_primary
     assert css_vars["--atlas-font-ui"] == DEFAULT_DASHBOARD_THEME.typography.font_ui
+    assert css_vars["--atlas-graph-canvas-text"] == (
+        DEFAULT_DASHBOARD_THEME.palette.graph_canvas_text
+    )
     assert css_vars["--atlas-branding-logo-path"] == (
         DEFAULT_DASHBOARD_THEME.branding.logo_asset_relative_path
     )

@@ -1,8 +1,8 @@
 """
 dashboard_theme.py - Shared dashboard theme tokens and branding asset paths.
 
-Stage 0 keeps the current presentation mostly intact while centralizing the
-values that later redesign stages will swap more aggressively.
+The Stage 1 redesign uses this module as the source of truth for the
+dark-shell / light-canvas visual system and future branding polish.
 """
 
 from __future__ import annotations
@@ -23,6 +23,7 @@ class DashboardPalette:
     page_gradient_end: str
     page_glow_warm: str
     page_glow_cool: str
+    shell_background: str
     text_primary: str
     text_secondary: str
     text_muted: str
@@ -30,9 +31,17 @@ class DashboardPalette:
     accent_primary_dark: str
     accent_secondary: str
     surface_background: str
+    surface_background_alt: str
     surface_border: str
+    surface_border_strong: str
     surface_shadow: str
+    field_background: str
+    field_border: str
+    chip_background: str
+    chip_border: str
     graph_canvas_background: str
+    graph_canvas_text: str
+    graph_canvas_muted_text: str
     graph_edge: str
     graph_legend_background: str
     graph_legend_border: str
@@ -61,8 +70,11 @@ class DashboardSpacing:
     page_padding_mobile_x: str
     page_padding_mobile_bottom: str
     grid_gap: str
+    shell_gap: str
+    section_gap: str
     panel_padding: str
     card_padding: str
+    topbar_padding: str
     radius_panel: str
     radius_field: str
     shadow_blur: str
@@ -89,50 +101,62 @@ class DashboardTheme:
 
 DEFAULT_DASHBOARD_THEME = DashboardTheme(
     palette=DashboardPalette(
-        page_gradient_start="#f7f3ea",
-        page_gradient_mid="#eef4f2",
-        page_gradient_end="#f7fafc",
-        page_glow_warm="rgba(245, 158, 11, 0.18)",
-        page_glow_cool="rgba(15, 118, 110, 0.16)",
-        text_primary="#0f172a",
-        text_secondary="#334155",
-        text_muted="#64748b",
-        accent_primary="#0f766e",
-        accent_primary_dark="#0b3f3a",
-        accent_secondary="#f59e0b",
-        surface_background="rgba(255, 255, 255, 0.8)",
-        surface_border="rgba(15, 23, 42, 0.08)",
-        surface_shadow="rgba(15, 23, 42, 0.08)",
-        graph_canvas_background="rgba(255, 255, 255, 0.9)",
-        graph_edge="rgba(15, 23, 42, 0.18)",
-        graph_legend_background="rgba(255, 255, 255, 0.78)",
-        graph_legend_border="rgba(15, 23, 42, 0.08)",
-        selected_fill="#f97316",
-        selected_outline="#7c2d12",
-        vulnerable="#dc2626",
-        unknown="#f59e0b",
-        not_vulnerable="#22c55e",
+        page_gradient_start="#01071C",
+        page_gradient_mid="#021A3B",
+        page_gradient_end="#13223C",
+        page_glow_warm="rgba(255, 138, 0, 0.18)",
+        page_glow_cool="rgba(0, 194, 255, 0.16)",
+        shell_background="rgba(1, 7, 28, 0.66)",
+        text_primary="#E6E4D8",
+        text_secondary="#CCD7E2",
+        text_muted="#86B3CC",
+        accent_primary="#00C2FF",
+        accent_primary_dark="#40668A",
+        accent_secondary="#E6CB8D",
+        surface_background="rgba(4, 15, 38, 0.88)",
+        surface_background_alt="rgba(10, 28, 61, 0.92)",
+        surface_border="rgba(134, 179, 204, 0.18)",
+        surface_border_strong="rgba(134, 179, 204, 0.30)",
+        surface_shadow="rgba(1, 7, 28, 0.52)",
+        field_background="rgba(1, 7, 28, 0.42)",
+        field_border="rgba(134, 179, 204, 0.28)",
+        chip_background="rgba(134, 179, 204, 0.10)",
+        chip_border="rgba(134, 179, 204, 0.22)",
+        graph_canvas_background="#F3F1E8",
+        graph_canvas_text="#13223C",
+        graph_canvas_muted_text="#40668A",
+        graph_edge="rgba(19, 34, 60, 0.22)",
+        graph_legend_background="rgba(243, 241, 232, 0.90)",
+        graph_legend_border="rgba(64, 102, 138, 0.20)",
+        selected_fill="#00C2FF",
+        selected_outline="#021A3B",
+        vulnerable="#D94A38",
+        unknown="#FF8A00",
+        not_vulnerable="#4FBF6B",
     ),
     typography=DashboardTypography(
-        font_ui='"Avenir Next", "Trebuchet MS", "Gill Sans", sans-serif',
-        font_display='"Georgia", "Palatino Linotype", serif',
-        eyebrow_spacing="0.12em",
-        detail_kind_spacing="0.14em",
+        font_ui='"Avenir Next", "Segoe UI Variable", "Trebuchet MS", sans-serif',
+        font_display='"Avenir Next Condensed", "Avenir Next", "Trebuchet MS", sans-serif',
+        eyebrow_spacing="0.18em",
+        detail_kind_spacing="0.16em",
     ),
     spacing=DashboardSpacing(
-        content_max_width="1440px",
-        page_padding_top="32px",
-        page_padding_x="28px",
-        page_padding_bottom="40px",
-        page_padding_mobile_top="22px",
-        page_padding_mobile_x="16px",
-        page_padding_mobile_bottom="28px",
-        grid_gap="16px",
+        content_max_width="1800px",
+        page_padding_top="20px",
+        page_padding_x="20px",
+        page_padding_bottom="20px",
+        page_padding_mobile_top="16px",
+        page_padding_mobile_x="14px",
+        page_padding_mobile_bottom="20px",
+        grid_gap="18px",
+        shell_gap="18px",
+        section_gap="16px",
         panel_padding="18px",
-        card_padding="18px",
-        radius_panel="20px",
-        radius_field="12px",
-        shadow_blur="10px",
+        card_padding="14px",
+        topbar_padding="20px",
+        radius_panel="22px",
+        radius_field="14px",
+        shadow_blur="18px",
     ),
     branding=DashboardBranding(
         assets_dir=BRANDING_ASSETS_DIR,
@@ -152,6 +176,7 @@ def build_theme_css_variables(
         "--atlas-page-gradient-end": theme.palette.page_gradient_end,
         "--atlas-page-glow-warm": theme.palette.page_glow_warm,
         "--atlas-page-glow-cool": theme.palette.page_glow_cool,
+        "--atlas-shell-background": theme.palette.shell_background,
         "--atlas-text-primary": theme.palette.text_primary,
         "--atlas-text-secondary": theme.palette.text_secondary,
         "--atlas-text-muted": theme.palette.text_muted,
@@ -159,9 +184,17 @@ def build_theme_css_variables(
         "--atlas-accent-primary-dark": theme.palette.accent_primary_dark,
         "--atlas-accent-secondary": theme.palette.accent_secondary,
         "--atlas-surface-background": theme.palette.surface_background,
+        "--atlas-surface-background-alt": theme.palette.surface_background_alt,
         "--atlas-surface-border": theme.palette.surface_border,
+        "--atlas-surface-border-strong": theme.palette.surface_border_strong,
         "--atlas-surface-shadow": theme.palette.surface_shadow,
+        "--atlas-field-background": theme.palette.field_background,
+        "--atlas-field-border": theme.palette.field_border,
+        "--atlas-chip-background": theme.palette.chip_background,
+        "--atlas-chip-border": theme.palette.chip_border,
         "--atlas-graph-canvas-background": theme.palette.graph_canvas_background,
+        "--atlas-graph-canvas-text": theme.palette.graph_canvas_text,
+        "--atlas-graph-canvas-muted-text": theme.palette.graph_canvas_muted_text,
         "--atlas-graph-edge": theme.palette.graph_edge,
         "--atlas-graph-legend-background": theme.palette.graph_legend_background,
         "--atlas-graph-legend-border": theme.palette.graph_legend_border,
@@ -182,8 +215,11 @@ def build_theme_css_variables(
         "--atlas-page-padding-mobile-x": theme.spacing.page_padding_mobile_x,
         "--atlas-page-padding-mobile-bottom": theme.spacing.page_padding_mobile_bottom,
         "--atlas-grid-gap": theme.spacing.grid_gap,
+        "--atlas-shell-gap": theme.spacing.shell_gap,
+        "--atlas-section-gap": theme.spacing.section_gap,
         "--atlas-panel-padding": theme.spacing.panel_padding,
         "--atlas-card-padding": theme.spacing.card_padding,
+        "--atlas-topbar-padding": theme.spacing.topbar_padding,
         "--atlas-radius-panel": theme.spacing.radius_panel,
         "--atlas-radius-field": theme.spacing.radius_field,
         "--atlas-shadow-blur": theme.spacing.shadow_blur,

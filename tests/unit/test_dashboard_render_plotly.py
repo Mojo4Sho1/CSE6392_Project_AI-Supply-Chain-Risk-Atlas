@@ -6,6 +6,7 @@ from copy import deepcopy
 
 from scripts._utils.dashboard_data import load_dashboard_state
 from scripts._utils.dashboard_render_plotly import render_visible_graph
+from scripts._utils.dashboard_theme import DEFAULT_DASHBOARD_THEME
 from scripts._utils.dashboard_view import build_dashboard_filters, build_visible_graph
 from tests.dashboard_fixtures import write_dashboard_artifacts
 
@@ -39,6 +40,8 @@ def test_render_visible_graph_emits_plotly_traces_with_node_ids(tmp_path):
             customdata_values.extend(list(trace.customdata))
     assert "model::example--model-a--11111111" in customdata_values
     assert state.package_lookup_by_name["shared-lib"][0].node_id in customdata_values
+    assert figure.layout.plot_bgcolor == DEFAULT_DASHBOARD_THEME.palette.graph_canvas_background
+    assert figure.layout.font.color == DEFAULT_DASHBOARD_THEME.palette.graph_canvas_text
 
 
 def test_render_visible_graph_does_not_mutate_visible_graph(tmp_path):

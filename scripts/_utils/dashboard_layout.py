@@ -1,8 +1,5 @@
 """
-dashboard_layout.py - Dash component construction for the local showcase shell.
-
-Stage 0 keeps the existing layout behavior but isolates the component tree so
-Stage 1 can redesign the shell without reworking callbacks or data plumbing.
+dashboard_layout.py - Dash component construction for the Stage 1 dashboard shell.
 """
 
 from __future__ import annotations
@@ -29,7 +26,7 @@ def build_dashboard_layout(
     *,
     theme: DashboardTheme = DEFAULT_DASHBOARD_THEME,
 ) -> html.Div:
-    """Build the static dashboard component tree with theme-backed shell vars."""
+    """Build the static Stage 1 dashboard component tree."""
     initial_outputs = compute_dashboard_outputs(
         state,
         search_text="",
@@ -40,173 +37,276 @@ def build_dashboard_layout(
         selected_node_id=None,
         click_data=None,
     )
+    model_count = len(state.model_lookup_by_model_id)
+    package_count = int(state.summary_payload["global_metrics"]["unique_package_count"])
+    reused_vulnerable_count = len(state.summary_payload["reused_vulnerable_packages"])
 
     return html.Div(
         className="dashboard-page",
         style=build_theme_css_variables(theme),
         children=[
+            dcc.Store(id="selected-node-store", data=initial_outputs.selected_node_id),
             html.Div(
                 className="dashboard-shell",
                 children=[
-                    dcc.Store(id="selected-node-store", data=initial_outputs.selected_node_id),
                     html.Header(
-                        className="dashboard-header",
+                        id="dashboard-topbar",
+                        className="dashboard-topbar",
                         children=[
-                            html.P("AI Supply Chain Risk Atlas", className="eyebrow"),
-                            html.H1("Local Showcase Dashboard"),
-                            html.P(
-                                "A single-page explorer over the validated M1-M4 graph and report artifacts.",
-                                className="header-subtitle",
-                            ),
-                        ],
-                    ),
-                    html.Section(
-                        className="overview-grid",
-                        children=[
-                            _metric_card(
-                                "Unique packages",
-                                str(state.summary_payload["global_metrics"]["unique_package_count"]),
-                                "Global package node count from the typed atlas graph.",
-                            ),
-                            _metric_card(
-                                "Avg packages / model",
-                                _format_metric(
-                                    state.summary_payload["global_metrics"][
-                                        "average_packages_per_model"
-                                    ]
-                                ),
-                                "Mean model dependency footprint across the sample.",
-                            ),
-                            _metric_card(
-                                "Avg direct / model",
-                                _format_metric(
-                                    state.summary_payload["global_metrics"][
-                                        "average_direct_packages_per_model"
-                                    ]
-                                ),
-                                "Direct dependency mean from visible M3 edges.",
-                            ),
-                            _metric_card(
-                                "Avg transitive / model",
-                                _format_metric(
-                                    state.summary_payload["global_metrics"][
-                                        "average_transitive_packages_per_model"
-                                    ]
-                                ),
-                                "Transitive dependency mean from visible M3 edges.",
+                            html.Div(
+                                className="topbar-copy",
+                                children=[
+                                    html.P("AI Supply Chain Risk Atlas", className="eyebrow"),
+                                    html.H1("Graph Risk Explorer"),
+                                    html.P(
+                                        (
+                                            "A graph-first local research shell over the validated "
+                                            "M1-M4 artifacts. Filters and details support the atlas "
+                                            "without overpowering it."
+                                        ),
+                                        className="header-subtitle",
+                                    ),
+                                ],
                             ),
                             html.Div(
-                                className="overview-table-card",
+                                className="topbar-badges",
                                 children=[
-                                    html.Div(
-                                        className="panel-heading",
-                                        children=[
-                                            html.H2("Top Reused Vulnerable Packages"),
-                                            html.P("From reports/summary.json"),
-                                        ],
+                                    _topbar_badge("Dataset", f"{model_count} models"),
+                                    _topbar_badge("Package nodes", f"{package_count} packages"),
+                                    _topbar_badge(
+                                        "Reuse hotspots",
+                                        f"{reused_vulnerable_count} vulnerable packages",
                                     ),
-                                    _build_reused_package_table(state),
+                                    _topbar_badge("Renderer", "Plotly active"),
                                 ],
                             ),
                         ],
                     ),
-                    html.Section(
-                        className="workspace-grid",
+                    html.Div(
+                        className="dashboard-workspace",
                         children=[
                             html.Aside(
-                                className="filter-panel",
+                                id="dashboard-sidebar-left",
+                                className="dashboard-sidebar dashboard-sidebar-left",
                                 children=[
-                                    html.Div(
-                                        className="panel-heading",
+                                    html.Section(
+                                        className="sidebar-section",
                                         children=[
-                                            html.H2("Filters"),
-                                            html.P("Search, scope, and risk-state controls."),
-                                        ],
-                                    ),
-                                    html.Label(
-                                        "Search",
-                                        className="control-label",
-                                        htmlFor="search-input",
-                                    ),
-                                    dcc.Input(
-                                        id="search-input",
-                                        className="text-input",
-                                        debounce=True,
-                                        placeholder="hf_model_id, model_id, or package name",
-                                        type="text",
-                                        value="",
-                                    ),
-                                    _checklist_block(
-                                        "Node type",
-                                        "node-type-filter",
-                                        ALL_NODE_TYPES,
-                                        list(ALL_NODE_TYPES),
-                                    ),
-                                    _checklist_block(
-                                        "Dependency scope",
-                                        "dependency-scope-filter",
-                                        ALL_DEPENDENCY_SCOPES,
-                                        list(ALL_DEPENDENCY_SCOPES),
-                                    ),
-                                    _checklist_block(
-                                        "Vulnerability status",
-                                        "vuln-status-filter",
-                                        ALL_VULN_STATUSES,
-                                        list(ALL_VULN_STATUSES),
-                                    ),
-                                    _checklist_block(
-                                        "Severity bucket",
-                                        "severity-filter",
-                                        ALL_SEVERITY_BUCKETS,
-                                        list(ALL_SEVERITY_BUCKETS),
-                                    ),
-                                ],
-                            ),
-                            html.Div(
-                                className="graph-panel",
-                                children=[
-                                    html.Div(
-                                        className="panel-heading",
-                                        children=[
-                                            html.H2("Graph Explorer"),
-                                            html.P(
-                                                "Models stay labeled by default; packages surface labels when selected."
+                                            _panel_heading(
+                                                "Search + Filters",
+                                                "Narrow the visible graph by entity type, scope, and risk state.",
+                                            ),
+                                            html.Label(
+                                                "Search",
+                                                className="control-label",
+                                                htmlFor="search-input",
+                                            ),
+                                            dcc.Input(
+                                                id="search-input",
+                                                className="text-input",
+                                                debounce=True,
+                                                placeholder="hf_model_id, model_id, or package name",
+                                                type="text",
+                                                value="",
+                                            ),
+                                            _checklist_block(
+                                                "Node type",
+                                                "node-type-filter",
+                                                ALL_NODE_TYPES,
+                                                list(ALL_NODE_TYPES),
+                                            ),
+                                            _checklist_block(
+                                                "Dependency scope",
+                                                "dependency-scope-filter",
+                                                ALL_DEPENDENCY_SCOPES,
+                                                list(ALL_DEPENDENCY_SCOPES),
+                                            ),
+                                            _checklist_block(
+                                                "Vulnerability status",
+                                                "vuln-status-filter",
+                                                ALL_VULN_STATUSES,
+                                                list(ALL_VULN_STATUSES),
+                                            ),
+                                            _checklist_block(
+                                                "Severity bucket",
+                                                "severity-filter",
+                                                ALL_SEVERITY_BUCKETS,
+                                                list(ALL_SEVERITY_BUCKETS),
                                             ),
                                         ],
                                     ),
-                                    dcc.Graph(
-                                        id="atlas-graph",
-                                        className="atlas-graph",
-                                        config={"displayModeBar": False, "scrollZoom": True},
-                                        figure=initial_outputs.figure,
+                                    html.Section(
+                                        className="sidebar-section",
+                                        children=[
+                                            _panel_heading(
+                                                "Snapshot Metrics",
+                                                "Compact atlas context from reports/summary.json.",
+                                            ),
+                                            html.Div(
+                                                className="sidebar-metric-grid",
+                                                children=[
+                                                    _metric_card(
+                                                        "Unique packages",
+                                                        str(package_count),
+                                                        "Shared package nodes in the atlas.",
+                                                    ),
+                                                    _metric_card(
+                                                        "Avg packages / model",
+                                                        _format_metric(
+                                                            state.summary_payload["global_metrics"][
+                                                                "average_packages_per_model"
+                                                            ]
+                                                        ),
+                                                        "Mean dependency footprint.",
+                                                    ),
+                                                    _metric_card(
+                                                        "Avg direct / model",
+                                                        _format_metric(
+                                                            state.summary_payload["global_metrics"][
+                                                                "average_direct_packages_per_model"
+                                                            ]
+                                                        ),
+                                                        "Visible direct package use.",
+                                                    ),
+                                                    _metric_card(
+                                                        "Avg transitive / model",
+                                                        _format_metric(
+                                                            state.summary_payload["global_metrics"][
+                                                                "average_transitive_packages_per_model"
+                                                            ]
+                                                        ),
+                                                        "Visible transitive package use.",
+                                                    ),
+                                                ],
+                                            ),
+                                        ],
                                     ),
-                                    html.P(
-                                        initial_outputs.status_text,
-                                        className="graph-status",
-                                        id="graph-status-text",
+                                    html.Section(
+                                        className="sidebar-section",
+                                        children=[
+                                            _panel_heading(
+                                                "Reuse Hotspots",
+                                                "Most reused vulnerable packages in the current artifact snapshot.",
+                                            ),
+                                            html.Div(
+                                                className="table-shell",
+                                                children=[_build_reused_package_table(state)],
+                                            ),
+                                        ],
                                     ),
                                 ],
                             ),
-                            html.Aside(
-                                className="detail-panel",
+                            html.Main(
+                                id="dashboard-main-pane",
+                                className="dashboard-main-pane",
                                 children=[
-                                    html.Div(
-                                        className="panel-heading",
+                                    html.Section(
+                                        className="graph-panel",
                                         children=[
-                                            html.H2("Detail View"),
-                                            html.P("Selection-driven model and package inspection."),
+                                            html.Div(
+                                                className="graph-panel-top",
+                                                children=[
+                                                    _panel_heading(
+                                                        "Atlas Graph",
+                                                        (
+                                                            "Model-package reuse and vulnerability exposure "
+                                                            "stay centered, with labels optimized for the "
+                                                            "current Plotly renderer."
+                                                        ),
+                                                    ),
+                                                    html.Div(
+                                                        className="graph-meta-row",
+                                                        children=[
+                                                            _context_chip(
+                                                                "Initial scope",
+                                                                (
+                                                                    f"{len(state.node_lookup)} nodes | "
+                                                                    f"{len(state.edges)} edges"
+                                                                ),
+                                                            ),
+                                                            _context_chip(
+                                                                "Selection",
+                                                                "Single-node inspector",
+                                                            ),
+                                                            _context_chip(
+                                                                "Labels",
+                                                                "Models default, packages on select",
+                                                            ),
+                                                        ],
+                                                    ),
+                                                ],
+                                            ),
+                                            html.Div(
+                                                className="graph-stage",
+                                                children=[
+                                                    dcc.Graph(
+                                                        id="atlas-graph",
+                                                        className="atlas-graph",
+                                                        config={
+                                                            "displayModeBar": False,
+                                                            "scrollZoom": True,
+                                                        },
+                                                        figure=initial_outputs.figure,
+                                                    )
+                                                ],
+                                            ),
+                                            html.Div(
+                                                className="graph-footer",
+                                                children=[
+                                                    html.P(
+                                                        initial_outputs.status_text,
+                                                        className="graph-status",
+                                                        id="graph-status-text",
+                                                    ),
+                                                    html.P(
+                                                        (
+                                                            "Search and filters intersect deterministically "
+                                                            "across the live graph and report artifacts."
+                                                        ),
+                                                        className="graph-caption",
+                                                    ),
+                                                ],
+                                            ),
                                         ],
-                                    ),
-                                    html.Div(
-                                        build_detail_panel(initial_outputs.detail_payload),
-                                        id="detail-panel",
-                                    ),
+                                    )
+                                ],
+                            ),
+                            html.Aside(
+                                id="dashboard-sidebar-right",
+                                className="dashboard-sidebar dashboard-sidebar-right",
+                                children=[
+                                    html.Section(
+                                        className="sidebar-section",
+                                        children=[
+                                            _panel_heading(
+                                                "Selection Inspector",
+                                                "Single-node detail context for models and packages.",
+                                            ),
+                                            html.Div(
+                                                className="inspector-note",
+                                                children=[
+                                                    html.P(
+                                                        (
+                                                            "Click a node in the graph to inspect dependency "
+                                                            "counts, risk metadata, and vulnerability IDs "
+                                                            "without leaving the main canvas."
+                                                        )
+                                                    )
+                                                ],
+                                            ),
+                                            html.Div(
+                                                build_detail_panel(initial_outputs.detail_payload),
+                                                id="detail-panel",
+                                                className="detail-panel-body",
+                                            ),
+                                        ],
+                                    )
                                 ],
                             ),
                         ],
                     ),
                 ],
-            )
+            ),
         ],
     )
 
@@ -214,6 +314,26 @@ def build_dashboard_layout(
 def build_detail_panel(detail_payload: dict[str, object]) -> html.Div:
     """Render the canonical detail payload into Dash components."""
     vulnerability_ids = detail_payload.get("vulnerability_ids", [])
+    if detail_payload.get("kind") == "empty":
+        return html.Div(
+            className="detail-shell detail-shell-empty",
+            children=[
+                html.P("Inspector Ready", className="detail-kind"),
+                html.H3(str(detail_payload["title"]), className="detail-title"),
+                html.P(
+                    "Use the graph, search, or filters to focus the atlas and inspect one node at a time.",
+                    className="detail-subtitle",
+                ),
+                html.Ul(
+                    className="detail-empty-list",
+                    children=[
+                        html.Li("Model nodes summarize dependency footprint and vulnerable dependencies."),
+                        html.Li("Package nodes show status, severity, impacted models, and vulnerability IDs."),
+                    ],
+                ),
+            ],
+        )
+
     return html.Div(
         className="detail-shell",
         children=[
@@ -236,11 +356,18 @@ def build_detail_panel(detail_payload: dict[str, object]) -> html.Div:
             html.Div(
                 className="detail-vulns",
                 children=[
-                    html.P("Associated vulnerability IDs", className="control-label"),
-                    html.Ul(
-                        [html.Li(vuln_id) for vuln_id in vulnerability_ids]
-                        if vulnerability_ids
-                        else [html.Li("No vulnerability IDs for the current selection.")],
+                    html.P("Associated vulnerability IDs", className="detail-section-title"),
+                    html.Div(
+                        className="detail-chip-list",
+                        children=[
+                            html.Span(str(vuln_id), className="detail-chip")
+                            for vuln_id in vulnerability_ids
+                        ],
+                    )
+                    if vulnerability_ids
+                    else html.P(
+                        "No vulnerability IDs for the current selection.",
+                        className="detail-empty-note",
                     ),
                 ],
             ),
@@ -259,8 +386,38 @@ def _metric_card(title: str, value: str, description: str) -> html.Div:
     )
 
 
+def _topbar_badge(label: str, value: str) -> html.Div:
+    return html.Div(
+        className="topbar-badge",
+        children=[
+            html.P(label, className="topbar-badge-label"),
+            html.P(value, className="topbar-badge-value"),
+        ],
+    )
+
+
+def _context_chip(label: str, value: str) -> html.Div:
+    return html.Div(
+        className="context-chip",
+        children=[
+            html.Span(label, className="context-chip-label"),
+            html.Span(value, className="context-chip-value"),
+        ],
+    )
+
+
+def _panel_heading(title: str, subtitle: str) -> html.Div:
+    return html.Div(
+        className="panel-heading",
+        children=[
+            html.H2(title),
+            html.P(subtitle),
+        ],
+    )
+
+
 def _build_reused_package_table(state: DashboardState) -> html.Table:
-    top_packages = state.summary_payload["reused_vulnerable_packages"][:10]
+    top_packages = state.summary_payload["reused_vulnerable_packages"][:8]
     header = html.Thead(
         html.Tr(
             [

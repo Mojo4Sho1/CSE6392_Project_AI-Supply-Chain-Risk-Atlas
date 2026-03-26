@@ -84,7 +84,7 @@ Phased implementation roadmap for the AI Supply Chain Risk Atlas pipeline. Agent
 - [x] Review the live dashboard and lock the redesign roadmap (T-026)
 - [x] Create simple LaTeX report scaffold for the final write-up (T-028)
 - [x] Dashboard redesign Stage 0: audit and refactor preparation (T-029)
-- [ ] Dashboard redesign Stage 1: new app shell, layout, and theme (T-030)
+- [x] Dashboard redesign Stage 1: new app shell, layout, and theme (T-030)
 - [ ] Dashboard redesign Stage 2: branding pass and visual refinement (T-031)
 - [ ] Dashboard redesign Stage 3: Cytoscape migration (T-032)
 - [ ] Dashboard redesign Stage 4: selection workflow and inspector redesign (T-033)

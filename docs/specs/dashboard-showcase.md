@@ -10,7 +10,7 @@ Define the v1 local showcase dashboard for the AI Supply Chain Risk Atlas. This 
 
 - Delivery target: local-only v1 dashboard
 - Framework: Dash + Plotly
-- Layout model: single-page app with overview row, filter rail, graph explorer, and detail panel
+- Layout model: single-page graph-first shell with a top bar, left control/sidebar, center graph explorer, and right detail inspector
 - Role in project: optional showcase layer after M4, not a required milestone pipeline output
 - Data policy: read-only consumer of pipeline artifacts; must not recompute or mutate M1-M4 outputs
 - Renderer policy: keep a renderer seam so a future Cytoscape renderer can reuse the same data/view-model layer
@@ -52,9 +52,9 @@ Operational rules:
 
 ## Required app surfaces
 
-The v1 dashboard is a single-page app. These surfaces may appear as sections within that page rather than separate routes.
+The v1 dashboard is a single-page app. Stage 1 organizes these surfaces inside a graph-first shell: top bar, left sidebar, center graph pane, and right inspector. These surfaces may appear as sections within that shell rather than as separate routes.
 
-### 1) Overview page
+### 1) Overview / context surfaces
 
 Must show:
 
@@ -64,6 +64,8 @@ Must show:
 - average direct packages per model
 - average transitive packages per model
 - top reused vulnerable packages
+
+These may live in compact cards or tables inside the top bar or left sidebar rather than a dedicated overview row.
 
 ### 2) Graph explorer
 

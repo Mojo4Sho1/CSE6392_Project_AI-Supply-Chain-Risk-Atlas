@@ -78,6 +78,10 @@ class TestRunDashboardIntegration:
 
         assert Path(app.config.assets_folder) == DASHBOARD_ASSETS_DIR
         assert {
+            "dashboard-topbar",
+            "dashboard-sidebar-left",
+            "dashboard-main-pane",
+            "dashboard-sidebar-right",
             "search-input",
             "node-type-filter",
             "dependency-scope-filter",

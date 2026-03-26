@@ -93,7 +93,7 @@ def render_visible_graph(
                 showlegend=True,
                 text=[str(node.attrs["hf_model_id"]) for node in model_nodes],
                 textfont={
-                    "color": theme.palette.text_primary,
+                    "color": theme.palette.graph_canvas_text,
                     "family": theme.typography.font_ui,
                     "size": 11,
                 },
@@ -135,11 +135,20 @@ def render_visible_graph(
     figure.update_layout(
         clickmode="event+select",
         dragmode="pan",
+        font={
+            "color": theme.palette.graph_canvas_text,
+            "family": theme.typography.font_ui,
+        },
         hovermode="closest",
         legend={
             "bgcolor": theme.palette.graph_legend_background,
             "bordercolor": theme.palette.graph_legend_border,
             "borderwidth": 1,
+            "font": {
+                "color": theme.palette.graph_canvas_text,
+                "family": theme.typography.font_ui,
+                "size": 11,
+            },
             "orientation": "h",
             "x": 0.0,
             "y": 1.02,
@@ -161,7 +170,7 @@ def render_visible_graph(
             y=0.5,
             yref="paper",
             font={
-                "color": "#475569",
+                "color": theme.palette.graph_canvas_muted_text,
                 "family": theme.typography.font_ui,
                 "size": 14,
             },

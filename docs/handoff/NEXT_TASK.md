@@ -5,14 +5,14 @@
 
 ## Task summary
 
-Implement **Dashboard Redesign Stage 1: New App Shell, Layout, and Theme** from `docs/dashboard_redesign_plan.md`. This batch should turn the current stacked prototype into the graph-first shell described in the redesign plan while preserving the existing Plotly renderer and analytical behavior.
+Implement **Dashboard Redesign Stage 2: Branding Pass and Visual Refinement** from `docs/dashboard_redesign_plan.md`. This batch should polish the new Stage 1 shell with optional branding placement, clearer status styling, and more deliberate legend/empty-state/panel treatment while preserving the existing Plotly renderer and analytical behavior.
 
-**Task queue references:** T-030 (see `docs/handoff/TASK_QUEUE.md`)
+**Task queue references:** T-031 (see `docs/handoff/TASK_QUEUE.md`)
 
 ## Why this task is next
 
-- Stage 0 is complete: theme tokens, branding asset routing, a layout module, and a controller layer now exist, so Stage 1 no longer needs to rediscover structure before changing the shell.
-- The redesign plan explicitly says to implement one stage per batch, and Stage 1 is the first stage that should make the dashboard visibly feel like an application instead of a report page.
+- Stage 1 is complete: the top bar / left sidebar / center graph / right inspector shell now exists, so Stage 2 can focus on visual cohesion instead of restructuring the app.
+- The redesign plan explicitly separates branding polish from shell work, and this is the next bounded batch before the Stage 3 Cytoscape migration.
 
 Long-horizon reference:
 - `docs/handoff/CAMPAIGN_PLAN.md` (phased roadmap)
@@ -20,31 +20,28 @@ Long-horizon reference:
 
 ## Recommended task order
 
-1. **T-030:** Read `docs/dashboard_redesign_plan.md` Stage 1 and `docs/dashboard_architecture_note.md` to align the new shell with the post-Stage-0 file split
-2. **T-030:** Redesign the Dash layout in `scripts/_utils/dashboard_layout.py` around the graph-first shell: top bar, left sidebar, center graph region, right inspector
-3. **T-030:** Update `scripts/_utils/dashboard_theme.py` and `assets/dashboard.css` to apply the dark-shell / light-canvas theme without changing dashboard semantics
-4. **T-030:** Keep the current Plotly renderer working, extend tests as needed, then update handoff docs so Stage 2 can focus on branding polish rather than layout restructuring
+1. **T-031:** Read `docs/dashboard_redesign_plan.md` Stage 2, `docs/handoff/CURRENT_STATUS.md`, `docs/specs/dashboard-showcase.md`, and `assets/branding/README.md`
+2. **T-031:** Make branding treatments and any logo placement easy to enable, disable, or relocate without hard-requiring a logo asset
+3. **T-031:** Refine panel styling, badges, legend treatment, empty states, and microcopy in `scripts/_utils/dashboard_layout.py`, `scripts/_utils/dashboard_theme.py`, and `assets/dashboard.css`
+4. **T-031:** Keep the current Plotly renderer working, extend tests as needed, then update handoff docs so Stage 3 can focus on Cytoscape instead of revisiting branding polish
 
 ## Scope (in)
 
-- Dashboard Stage 1 only, as defined in `docs/dashboard_redesign_plan.md`
-- A graph-first application shell with:
-  - top bar
-  - left control/sidebar area
-  - center graph pane
-  - right detail/inspector pane
-- Theme updates needed for the dark shell and light graph canvas
-- Compact metric cards and clearer panel grouping
-- Tests for any changed layout/theme behavior
+- Dashboard Stage 2 only, as defined in `docs/dashboard_redesign_plan.md`
+- Branding-safe shell refinements inside the existing Stage 1 structure
+- Optional logo placement experiments or safe logo hooks
+- Legend, badge, heading, and empty-state polish
+- Small theme/layout refinements that improve cohesion without changing dashboard semantics
+- Tests for any changed layout/theme/branding behavior
 - Write unit tests and smoke tests for all new code (per `AGENTS.md` testing policy)
 
 ## Scope (out)
 
-- Stage 2 branding experiments and logo placement polish
 - Stage 3 Cytoscape migration
-- Changes to the validated M1-M4 pipeline outputs or schemas
-- Compare mode or multi-selection workflows
-- Semantic changes to filters, search behavior, or dashboard data contracts unless a small presentation fix absolutely requires them
+- Selection workflow redesign or compare mode
+- Stage 5 linked-summary interaction work such as clickable summary tables
+- Changes to validated M1-M4 pipeline outputs or schemas
+- Large shell restructuring that effectively repeats Stage 1
 
 ## Dependencies / prerequisites
 
@@ -54,31 +51,31 @@ Long-horizon reference:
   - `graphs/global.graphml`
   - `reports/summary.json`
   - `reports/summary.csv`
-  - Stage 0 dashboard refactor:
-    - `scripts/_utils/dashboard_theme.py`
-    - `scripts/_utils/dashboard_controller.py`
+  - Stage 1 dashboard shell:
     - `scripts/_utils/dashboard_layout.py`
-    - `docs/dashboard_architecture_note.md`
+    - `scripts/_utils/dashboard_theme.py`
+    - `scripts/_utils/dashboard_render_plotly.py`
+    - `assets/dashboard.css`
+    - `assets/branding/README.md`
 - Specs (read only what's needed):
-  - `docs/dashboard_redesign_plan.md` — authoritative Stage 1 layout/theme target
-  - `docs/specs/dashboard-showcase.md` — current dashboard contract and renderer seam
-  - `docs/handoff/CURRENT_STATUS.md` — exact Stage 0 completion state and verification caveats
-  - `README.md` — documented launch flow and local-dashboard positioning
+  - `docs/dashboard_redesign_plan.md` — authoritative Stage 2 visual target
+  - `docs/specs/dashboard-showcase.md` — current dashboard contract and shell expectations
+  - `docs/handoff/CURRENT_STATUS.md` — exact Stage 1 completion state and verification caveats
+  - `docs/dashboard_architecture_note.md` — file responsibility map after the Stage 0 refactor
 
 ## Implementation notes
 
 - Keep Plotly as the active renderer in this batch.
-- Focus the visible redesign in `scripts/_utils/dashboard_layout.py`, `scripts/_utils/dashboard_theme.py`, and `assets/dashboard.css`.
-- Preserve the Stage 0 data/view/controller split; do not re-collapse responsibilities into one module.
-- Keep single-node selection and the existing read-only artifact contract.
-- If port `8050` is occupied locally during manual verification, confirm the default command behavior first and then use a temporary alternate port for visual verification without changing the documented default.
+- Treat the Stage 1 shell as the baseline; prefer polish over panel relocation.
+- Any logo treatment must degrade cleanly when `assets/branding/ai_supply_chain_risk_atlas_logo.png` is absent.
+- If port `8050` is occupied locally during manual verification, confirm the default command behavior first and then use a temporary alternate port without changing the documented default.
 - Run `make test` after code changes and treat expected failure paths as normal outcomes, not crashes.
 
 ## Acceptance criteria (definition of done)
 
-- The dashboard uses a graph-first shell with top bar, left sidebar, center graph pane, and right inspector
-- The shell uses the Stage 1 dark-theme direction while keeping a light graph canvas
-- The graph is visually dominant above the fold and the page feels like an application rather than a report
+- The dashboard has a more cohesive branded identity without destabilizing the Stage 1 shell
+- Logo placement, if introduced, is easy to enable/disable or relocate
+- Legend, badges, headings, and empty states feel deliberate and readable
 - Existing analytical semantics and the Plotly renderer still work
 - All tests pass (`make test`)
 - Handoff docs updated (see mandatory final subtask below)
@@ -88,8 +85,8 @@ Long-horizon reference:
 - [ ] `python scripts/run_dashboard.py --help` works
 - [ ] `make dashboard` launches against the live repo artifacts
 - [ ] `make test` passes
-- [ ] The layout clearly maps to top bar / left sidebar / center graph / right inspector
-- [ ] The shell is dark while the graph canvas remains light
+- [ ] Branding treatment is safe when the logo asset is absent
+- [ ] The graph-first shell remains top bar / left sidebar / center graph / right inspector
 - [ ] Plotly is still the active renderer
 - [ ] No unresolved placeholder text in new code/docs
 
@@ -99,20 +96,20 @@ Long-horizon reference:
 
 Using `docs/handoff/NEXT_TASK_TEMPLATE.md` as a guide, update the following before closing this batch:
 
-- [ ] Mark T-030 as `done` in `docs/handoff/TASK_QUEUE.md`
+- [ ] Mark T-031 as `done` in `docs/handoff/TASK_QUEUE.md`
 - [ ] Tick completed checkboxes in `docs/handoff/CAMPAIGN_PLAN.md` Phase 5
 - [ ] Update `docs/handoff/PROJECT_CHECKLIST.md` if this batch changed showcase-track or optional renderer-track readiness
 - [ ] Rewrite `docs/handoff/CURRENT_STATUS.md`:
   - what was completed (concrete, verifiable)
   - checks run and their outcomes
   - any remaining blockers or caveats
-- [ ] Rewrite `docs/handoff/NEXT_TASK.md` to brief the next agent on Dashboard Redesign Stage 2, following `NEXT_TASK_TEMPLATE.md`
+- [ ] Rewrite `docs/handoff/NEXT_TASK.md` to brief the next agent on Dashboard Redesign Stage 3, following `NEXT_TASK_TEMPLATE.md`
 - [ ] If any spec changed during this batch, update `docs/specs/_INDEX.md`
 
 The next `NEXT_TASK.md` must itself include this same "Mandatory final subtask" section so the pattern propagates to every future agent.
 
 ## Risks / rollback notes
 
-- Do not drift into Stage 2 branding polish under the label of Stage 1 shell work
-- Do not break the current Plotly renderer or the existing filter/search/selection semantics while moving panels around
-- Do not introduce Cytoscape in this batch; that remains a Stage 3 task
+- Do not drift into Stage 3 Cytoscape work under the label of Stage 2 polish
+- Do not hard-wire branding to a required asset file or a single fixed logo placement
+- Do not let new branding treatments crowd the graph or undo the graph-first shell delivered in Stage 1
