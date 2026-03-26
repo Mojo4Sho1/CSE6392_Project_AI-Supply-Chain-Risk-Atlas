@@ -5,7 +5,7 @@
 
 ## Task summary
 
-Implement **Dashboard Redesign Stage 3: Cytoscape migration** from `docs/dashboard_redesign_plan.md`. Stage 2 is now complete, so the next batch should replace the active Plotly graph surface with Cytoscape while preserving the existing graph-first shell, current filtering/search semantics, and the renderer-agnostic data/view/controller seams.
+Implement **Dashboard Redesign Stage 3: Cytoscape migration** from `docs/dashboard_redesign_plan.md` on branch `dashboard-stage3-cytoscape`, not on `main`. Stage 2 is now complete, so the next batch should replace the active Plotly graph surface with Cytoscape while preserving the existing graph-first shell, current filtering/search semantics, and the renderer-agnostic data/view/controller seams while leaving `main` available as the approved Plotly fallback if the Cytoscape result is not accepted.
 
 **Task queue references:** T-032 (see `docs/handoff/TASK_QUEUE.md`)
 
@@ -21,11 +21,12 @@ Long-horizon reference:
 
 ## Recommended task order
 
-1. **T-032:** Read `docs/dashboard_redesign_plan.md` Stage 3, `docs/handoff/CURRENT_STATUS.md`, `docs/specs/dashboard-showcase.md`, and `docs/dashboard_architecture_note.md`
-2. **T-032:** Update `docs/specs/dashboard-showcase.md` first if the renderer/runtime contract needs to change for Cytoscape, and update `docs/specs/_INDEX.md` in the same batch
-3. **T-032:** Add the Cytoscape renderer path and any required dependency/runtime wiring (likely including `environment.yml`, dashboard renderer modules, and app/layout integration)
-4. **T-032:** Preserve the Stage 1 shell and Stage 2 polish while migrating only the graph surface and renderer-specific interactions
-5. **T-032:** Extend tests, verify the live dashboard runtime, then update handoff docs so Stage 4 can focus on selection workflow rather than renderer migration
+1. **T-032:** Confirm `git branch --show-current` returns `dashboard-stage3-cytoscape` before making any Stage 3 edits; do not implement on `main`
+2. **T-032:** Read `docs/dashboard_redesign_plan.md` Stage 3, `docs/handoff/CURRENT_STATUS.md`, `docs/specs/dashboard-showcase.md`, and `docs/dashboard_architecture_note.md`
+3. **T-032:** Update `docs/specs/dashboard-showcase.md` first if the renderer/runtime contract needs to change for Cytoscape, and update `docs/specs/_INDEX.md` in the same batch
+4. **T-032:** Add the Cytoscape renderer path and any required dependency/runtime wiring (likely including `environment.yml`, dashboard renderer modules, and app/layout integration)
+5. **T-032:** Preserve the Stage 1 shell and Stage 2 polish while migrating only the graph surface and renderer-specific interactions
+6. **T-032:** Extend tests, verify the live dashboard runtime, then update handoff docs so Stage 4 can focus on selection workflow rather than renderer migration
 
 ## Scope (in)
 
@@ -77,6 +78,8 @@ Long-horizon reference:
 
 ## Implementation notes
 
+- This batch is intentionally staged on branch `dashboard-stage3-cytoscape`; keep `main` untouched so the current Plotly dashboard remains an easy fallback if the Cytoscape result is not approved.
+- If you somehow land on `main`, stop and switch back to `dashboard-stage3-cytoscape` before editing files.
 - Update the spec first if Cytoscape behavior is not already covered; do not let the renderer change outpace the written contract.
 - Keep `dashboard_data.py`, `dashboard_view.py`, and the core filtering logic renderer-agnostic.
 - Prefer adding a dedicated Cytoscape renderer module rather than overloading the Plotly renderer file with divergent behavior.
@@ -99,6 +102,7 @@ Long-horizon reference:
 
 ## Verification checklist
 
+- [ ] `git branch --show-current` returns `dashboard-stage3-cytoscape`
 - [ ] `python scripts/run_dashboard.py --help` works
 - [ ] `make dashboard` launches against the live repo artifacts
 - [ ] `make test` passes

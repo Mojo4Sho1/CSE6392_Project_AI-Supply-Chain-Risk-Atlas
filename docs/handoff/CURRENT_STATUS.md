@@ -43,6 +43,8 @@ Dashboard Redesign Stage 2 is complete. The current dashboard now keeps the no-l
 ## Active coordination notes
 
 - Stage 2 is complete; the next dashboard batch should focus only on Stage 3 Cytoscape migration
+- The dedicated Stage 3 work branch is `dashboard-stage3-cytoscape`; the next agent should work there instead of `main`
+- Keep `main` as the currently approved Plotly fallback baseline until the Cytoscape result is reviewed and explicitly accepted
 - Keep the graph-first shell intact:
   - top bar
   - left sidebar
@@ -61,7 +63,7 @@ Dashboard Redesign Stage 2 is complete. The current dashboard now keeps the no-l
 
 ## Next task (single target)
 
-Begin Dashboard Redesign Stage 3: Cytoscape migration. See `NEXT_TASK.md` for the implementation brief and `docs/dashboard_redesign_plan.md` for the Stage 3 acceptance criteria.
+Begin Dashboard Redesign Stage 3: Cytoscape migration on branch `dashboard-stage3-cytoscape`. See `NEXT_TASK.md` for the implementation brief and `docs/dashboard_redesign_plan.md` for the Stage 3 acceptance criteria.
 
 ## Definition of done for next task
 
