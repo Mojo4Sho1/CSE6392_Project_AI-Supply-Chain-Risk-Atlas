@@ -1,362 +1,311 @@
-# CSE6392_Project_AI_Supply_Chain_Risk_Atlas
-
 # AI Supply Chain Risk Atlas
 
-Graph-based vulnerability mapping of open-source AI model ecosystems.
+A reproducible pipeline for analyzing dependency-driven security exposure across open-source AI model ecosystems.
 
-This project builds a **typed dependency graph** over a small sample of **popular Hugging Face models**, annotates dependency nodes with **known vulnerabilities**, and produces an interpretable “risk atlas” that highlights **where risk concentrates** and **how it propagates** through shared dependencies.
+This repository builds a model-centered **risk atlas** over a curated sample of open-source Hugging Face model repositories. Instead of treating each repository as an isolated scan target, the project constructs a typed **model–package graph** that shows where vulnerable packages appear, which models reuse them, and how dependency-driven exposure overlaps across the sample.
 
----
-
-## Goals
-
-1. Build a reproducible pipeline to:
-   - Select a constrained sample of open-source AI models
-   - Extract dependencies (direct + transitive) from their public repos
-   - Identify known vulnerabilities affecting those dependencies
-   - Construct a typed **Model–Package risk graph**
-2. Produce an “atlas-style” set of analyses and visualizations:
-   - Rank models by dependency-related vulnerability exposure
-   - Identify **shared vulnerable packages** creating cross-model risk
-   - Highlight vulnerability “hotspots” in the ecosystem
+The pipeline is intentionally artifact-driven and reproducible. Each stage emits inspectable intermediate outputs so that results can be audited, regenerated, and explored through both static reports and a local dashboard.
 
 ---
 
-## Scope
+## Current Status
 
-### Included
-- **10–20 popular Hugging Face models** (sample is intentionally constrained; v1 target is 15)
-- Models with:
-  - A **public source repository** available
-  - **Usable dependency artifacts** (manifests and/or lockfiles)
+This repository contains a completed **v1 pipeline** for analyzing dependency-driven software supply chain exposure in a curated sample of open-source Hugging Face model repositories.
 
-### Excluded
-- Closed-source models
-- Repos with insufficient dependency visibility (e.g., no manifests/lockfiles, or artifacts that cannot be scanned)
+Implemented components include:
 
-> Note: Vulnerability data is typically **package + version scoped**. In v1, if a repo does not pin versions, findings are marked as **unknown**.
+- curated model intake via `data/models.csv`
+- artifact-only dependency ingestion
+- OSV-based vulnerability scanning and normalization
+- typed model–package graph construction
+- aggregate reporting and figure generation
+- local read-only dashboard via `make dashboard`
 
----
-
-## High-Level Pipeline
-
-1. **Model selection**
-   - Use human-curated rows in `data/models.csv` (v1 default)
-   - Validate candidate rows against strict eligibility policy
-   - Freeze per-model intake and provenance into `manifests/<model_id>/manifest_index.json`
-
-2. **Repo ingestion**
-   - Fetch dependency artifacts only (artifact-only mode)
-   - Record commit SHA
-   - Collect dependency artifacts (e.g., `requirements.txt`, `poetry.lock`, `package.json`, lockfiles)
-
-3. **Dependency + vulnerability extraction**
-   - Run **OSV-Scanner** over each selected model's dependency artifact set
-   - Store raw scanner outputs
-   - Normalize results into a stable schema for graph construction
-
-4. **Graph construction**
-   - Build a typed graph:
-     - Model nodes
-     - Package nodes
-     - Typed edges for dependency relationships
-   - Annotate package nodes with vulnerability features (severity bucket, fix availability, etc.)
-
-5. **Evaluation + reporting**
-   - Compute metrics (dependency footprint, vulnerability exposure, risk structure)
-   - Generate ranked views and visuals (“atlas” outputs)
+The current workflow is designed to preserve intermediate artifacts at each stage so that results remain reproducible and easy to inspect.
 
 ---
 
-## Data Artifacts and Directory Layout
+## Quickstart
 
-This repo is expected to produce and/or store the following artifacts:
-
-```
-data/
-  models.csv                   # curated candidate list and v1 authoritative input
-manifests/
-  <model_id>/manifest_index.json
-osv/
-  <model_id>/raw.json          # raw OSV-Scanner JSON output
-  <model_id>/normalized.json   # normalized schema for graph build
-graphs/
-  global.graphml               # full atlas graph
-  per_model/
-    <model_id>.graphml         # optional per-model subgraph
-reports/
-  summary.json                 # aggregate metrics
-  summary.csv                  # tabular metrics / rankings
-figures/
-  ...                          # plots / atlas visuals
-docs/
-  specs/
-    _INDEX.md                  # spec routing table for selective agent loading
-    decision-log.md            # accepted policy defaults and change-control
-  handoff/
-    CURRENT_STATUS.md          # current project status
-    NEXT_TASK.md               # next concrete task batch
-    PROJECT_CHECKLIST.md       # end-to-end milestone checklist and gates
-paper/
-  final_report.tex             # simple LaTeX draft for the final write-up / Overleaf handoff
-```
-
----
-
-## Dataset Input and Freeze Boundary
-
-In the implemented v1 pipeline, `data/models.csv` is the human-curated authoritative input file containing final selected candidates only.
-
-This makes analysis reproducible even if model popularity or repository state changes over time.
-
-The reproducible freeze boundary is the per-model manifest set written to:
-
-- `manifests/<model_id>/manifest_index.json`
-
-v1 policy defaults:
-- `data/models.csv` is human-owned input.
-- default sample target is 15 models.
-- automated model ranking is deferred.
-- `dependency_artifact` and `dependency_artifact_url` are optional human-curated hints; the ingestion script uses them as a starting point but may discover additional artifacts.
-- Eligibility is determined at runtime and recorded in output artifacts.
-
-For `data/models.csv`, columns are:
-
-| Column | Type | Required | Allowed values / format | Meaning |
-|---|---|---|---|---|
-| `hf_model_id` | string | yes | non-empty | Hugging Face model ID (e.g., `org/model`) |
-| `source_repo_url` | string | yes | public repo URL | Canonical source repository URL |
-| `dependency_artifact` | string | no | free text | Human hint: artifact filename/path |
-| `dependency_artifact_url` | string | no | URL | Direct URL to artifact in source repo |
-| `snapshot_timestamp_utc` | string | yes | `YYYY-MM-DDTHH:MM:SSZ` | Time the popularity metrics were captured |
-| `hf_downloads_at_snapshot` | integer | yes | `>= 0` | Downloads value at snapshot time |
-| `hf_likes_at_snapshot` | integer | yes | `>= 0` (shorthand like "2.59k" accepted) | Likes value at snapshot time |
-| `selection_rationale` | string | no | free text | Why this model was selected |
-| `curation_notes` | string | no | free text | Optional operator notes |
-
-### How To Curate `models.csv` Rows (v1)
-
-1. Find top candidate models on Hugging Face using likes/downloads.
-2. Keep only models with public source repositories.
-3. Verify the source repo has a recognizable dependency artifact (e.g., `requirements.txt`, `pyproject.toml`).
-4. Enter one row per final selected candidate with snapshot metrics and artifact hints.
-5. Eligibility is computed at runtime; do not add an `eligible` column.
-
----
-
-## Agent Workflow
-
-This repository is set up for agent-to-agent handoff and selective spec loading:
-
-1. Read `AGENTS.md`
-2. Read `docs/handoff/QUICK_REFERENCE.md`
-3. Read `docs/handoff/CURRENT_STATUS.md`
-4. Read `docs/handoff/NEXT_TASK.md`
-5. Read `docs/handoff/TASK_QUEUE.md`
-6. Read `docs/handoff/CAMPAIGN_PLAN.md`
-7. Read `docs/handoff/PROJECT_CHECKLIST.md`
-8. Read `docs/specs/_INDEX.md`
-9. Read only relevant spec files for the active task
-
-## Authoritative Contracts
-
-For implementation decisions, use these specs:
-
-- `docs/specs/decision-log.md` (policy defaults)
-- `docs/specs/artifact-schemas.md` (artifact schemas + enums)
-- `docs/specs/pipeline-execution-contract.md` (CLI/runtime behavior)
-- `docs/specs/testing-and-validation.md` (required validation gates)
-
----
-
-## Environment Setup
-
-Create and activate the shared conda environment:
+### 1. Create the environment
 
 ```bash
 conda env create -f environment.yml
 conda activate ai-supply-chain-risk-atlas
 ```
 
-Install OSV-Scanner separately as an external prerequisite on macOS:
+### 2. Install OSV-Scanner
+
+Install OSV-Scanner separately and ensure it is available on your `PATH`.
+
+### 3. Run the full pipeline
 
 ```bash
-brew install osv-scanner
-osv-scanner --version
+make all
 ```
 
-`environment.yml` manages the Python environment only; OSV-Scanner is expected to be available on your shell `PATH`.
-
-## Running the Pipeline
-
-From the repository root:
+### 4. Validate the generated outputs
 
 ```bash
-make ingest
-make scan
-make graph
-make report
-make all
-make dashboard
 make validate
 ```
 
-Command notes:
-
-- `make all` executes the full M1-M4 stage chain through reporting and may reuse already-generated stage outputs.
-- `make dashboard` launches the local read-only Dash + Plotly showcase against `graphs/global.graphml`, `reports/summary.json`, and `reports/summary.csv`.
-- `make validate` runs the Phase 5 local validation bundle: CLI smoke checks, `make all`, `make test`, artifact existence checks, and the unresolved-decision grep from `docs/specs/testing-and-validation.md`.
-- Use `make clean` before `make all` only when you intentionally want to regenerate all pipeline outputs from scratch.
-
-## Local Dashboard
-
-The optional showcase layer is a single-page Dash app with a Plotly-based graph explorer.
-
-Launch it from repo root with:
+### 5. Launch the local dashboard
 
 ```bash
 make dashboard
 ```
 
-Behavior notes:
+---
 
-- it reads the existing graph/report artifacts once at startup and does not regenerate pipeline outputs
-- the explorer is intentionally renderer-separated so a future Cytoscape swap can reuse the same data/view-model logic
-- the current v1 renderer is Plotly-only; `dash-cytoscape` is intentionally deferred
+## What This Repository Produces
+
+The repository produces a small set of high-value outputs:
+
+- **Curated model input**
+  - `data/models.csv`
+- **Per-model manifest and provenance artifacts**
+  - generated during ingestion
+- **Normalized vulnerability findings**
+  - generated during scanning
+- **Global model–package graph**
+  - generated during graph construction
+- **Aggregate reports and figures**
+  - generated during reporting
+- **Local dashboard**
+  - reads the graph and report artifacts at startup
+
+Representative output locations include:
+
+- `graphs/global.graphml`
+- `reports/summary.json`
+- `reports/summary.csv`
+- `figures/`
 
 ---
 
-## Graph Schema
+## High-Level Pipeline
 
-### Node Types
+The repository is organized as a reproducible four-stage pipeline followed by optional local visualization.
 
-#### 1) `Model`
-Represents a Hugging Face model in the selected sample.
+### M1. Ingest
+Collect model metadata and dependency artifacts from the selected repositories, record provenance, and evaluate eligibility.
 
-Minimum attributes:
-- `hf_model_id`
-- `source_repo_url`
-- `snapshot_timestamp_utc`
+### M2. Scan
+Run OSV-Scanner on eligible dependency artifacts and normalize raw findings into a stable schema for downstream processing.
 
-#### 2) `Package`
-Represents a dependency package used by one or more model repos.
+### M3. Graph
+Build a typed global graph over model nodes and package nodes.
 
-Minimum attributes:
-- `ecosystem` (e.g., `PyPI`, `npm`, `Maven`, `Go`, etc.)
-- `name`
-- `version` (string, or `null`/`unknown` if not resolvable)
+### M4. Report
+Compute aggregate metrics, per-model summaries, rankings, and figure-ready outputs.
 
-> Identity rule (deduplication): a package node is uniquely identified by `(ecosystem, name, version)`.
-
-### Edge Types
-
-#### 1) `uses_package` (Model → Package)
-Indicates that a model depends on a package (directly or transitively).
-
-Recommended attributes:
-- `dependency_scope`: `direct` | `transitive`
-- `depth`: integer depth when derivable (0 = direct)
-- `manifest_source`: file path that produced this relation (if known)
-
-#### 2) `depends_on` (Package → Package)
-Indicates package-to-package dependency relationships.
-
-Recommended attributes:
-- `edge_source`: lockfile vs scanner-derived dependency graph (if available)
-
-> v1 default: `depends_on` is deferred and not required for milestone completion.
+### Dashboard
+Load the generated graph and report artifacts into a local interactive explorer for inspection and presentation.
 
 ---
 
-## Vulnerability Annotation
+## Dataset and Selection Policy
 
-Vulnerabilities are attached as **node features** on `Package` nodes.
+The authoritative curated input is:
 
-Recommended package vulnerability fields:
-- `vuln_status`:
-  - `vulnerable` (known version matches an affected range)
-  - `not_vulnerable` (known version does not match)
-  - `unknown` (version is missing / cannot evaluate precisely)
-- `vuln_ids`: list of OSV/CVE/GHSA identifiers
-- `num_vulns`: integer count of unique `vuln_ids`
-- `max_severity_bucket`: `LOW | MEDIUM | HIGH | CRITICAL | UNKNOWN`
-- `fix_available`: boolean (true if OSV indicates a known fix version exists)
+- `data/models.csv`
 
-### Version Resolution Policy
+The dataset is intentionally constrained so that the analysis remains reproducible and each candidate can be evaluated against the same visibility rules.
 
-Because vulnerability matching is package+version scoped:
+### Inclusion criteria
 
-- If a lockfile pins versions, vulnerability status is **observed** (`vulnerable` / `not_vulnerable`).
-- If versions are unpinned, status is **unknown** in v1.
+A model repository is eligible only if it satisfies all of the following:
 
-This policy should remain consistent across all models in the dataset.
+- public source repository available
+- dependency artifacts are discoverable
+- dependency visibility is sufficient for downstream analysis
 
----
+### Exclusion criteria
 
-## Evaluation Metrics
+The following are excluded from the curated sample:
 
-### 1) Dependency Footprint
-- **Unique packages (global):** count distinct Package nodes
-- **Average packages per model:** mean number of package neighbors per Model
-  - broken out into direct vs transitive if available
+- closed-source models
+- repositories without usable dependency artifacts
+- repositories with insufficient dependency visibility for reproducible analysis
 
-### 2) Vulnerability Exposure
-- **Vulnerable direct dependencies:** per-model count of vulnerable packages with `dependency_scope=direct`
-- **Vulnerable transitive dependencies:** per-model count with `dependency_scope=transitive`
-- **Vulnerabilities per model:**
-  - `vulnerable_packages_per_model`
-  - `unique_vuln_ids_per_model`
-
-### 3) Risk Structure
-- **Most reused vulnerable packages:** rank vulnerable packages by number of distinct models connected
-- **Models impacted per vulnerable package:** distribution of model counts per vulnerable package
+This project does **not** attempt to crawl the full Hugging Face ecosystem automatically. Instead, it uses a curated input file so that the sample remains interpretable and stable across runs.
 
 ---
 
-## Milestones
+## Graph and Vulnerability Model
 
-### M1 — Ingestion & eligibility
-- Parse and validate `data/models.csv`
-- Generate `manifests/<model_id>/manifest_index.json`
+### Node types
 
-### M2 — Dependency + vulnerability extraction
-- Run OSV scanning across eligible model artifact sets
-- Normalize outputs into `osv/<model_id>/normalized.json`
+The atlas graph uses two node types:
 
-### M3 — Graph construction & validation
-- Build typed graph (`graphs/global.graphml`)
-- Validate package deduplication and edge integrity
+- **Model**
+  - a selected Hugging Face model repository
+- **Package**
+  - a deduplicated dependency identified by the tuple `(ecosystem, name, version)`
 
-### M4 — Evaluation, visualization, and reporting
-- Compute the required baseline metrics and rankings
-- Generate final figures / atlas visuals
-- Produce `reports/summary.(json|csv)`
+### Edge types
 
-### M5 — Local showcase dashboard
-- Launch the single-page Dash + Plotly explorer with `make dashboard`
-- Browse overview metrics, the typed graph, and model/package detail panels without mutating pipeline artifacts
+The validated v1 graph uses the edge type:
+
+- **`uses_package`**
+  - directed from `Model -> Package`
+
+For v1, dependency scope is represented as:
+
+- `direct`
+- `transitive`
+
+### Vulnerability annotations
+
+Package nodes retain vulnerability-related attributes such as:
+
+- vulnerability status
+- severity bucket
+- fix availability
+- vulnerability identifiers
+
+### Version resolution policy
+
+The project uses a conservative version-resolution policy.
+
+- If a package version is pinned tightly enough to support precise evaluation, the package can be labeled as observed vulnerable or observed not vulnerable.
+- If the version is missing, unresolved, or not pinned tightly enough to support precise evaluation, the package is assigned `vuln_status=unknown`.
+
+In other words, **`unknown` belongs to vulnerability evaluation**, not to dependency scope. This distinction is important in the current v1 design.
 
 ---
 
-## Tooling (minimal stack)
+## Dashboard
 
-- Hugging Face API / metadata
-- **OSV-Scanner**
-- Python + NetworkX
-- Dash + Plotly for the local showcase dashboard
+The repository includes an optional single-page local dashboard that loads the generated graph and report artifacts at startup and exposes the atlas as an interactive graph explorer.
+
+Launch it with:
+
+```bash
+make dashboard
+```
+
+The dashboard is designed as a **read-only visualization layer** over the generated artifacts. It supports quick inspection of:
+
+- model/package relationships
+- visible graph structure
+- snapshot metrics
+- reuse hotspots
+- selected-model dependency neighborhoods
+
+The current implementation uses Plotly and preserves a renderer seam so that future interface refinements can be introduced without rewriting the core data-loading and filtering logic.
 
 ---
 
-## Notes / Non-Goals
+## Evaluation Outputs
 
-- This project focuses on **dependency-driven** exposure, not model behavior, alignment, or dataset safety.
-- Findings are limited by:
-  - dependency visibility in repos
-  - quality of version pinning
-  - coverage/precision of public vulnerability databases
+The reporting stage summarizes the atlas through three main output categories.
+
+### Dependency footprint
+
+Examples include:
+
+- unique packages
+- average packages per model
+- direct vs. transitive package counts
+
+### Vulnerability exposure
+
+Examples include:
+
+- vulnerable direct dependencies
+- vulnerable transitive dependencies
+- vulnerability counts per model
+
+### Risk structure
+
+Examples include:
+
+- most reused vulnerable packages
+- impacted models per vulnerable package
+- cross-model structural overlap in exposure
+
+These outputs are intended to make dependency-driven risk easier to inspect and communicate than a flat repository-level scan report.
+
+---
+
+## Reproducibility Notes
+
+This project favors **artifact-only ingestion** over cloning full repositories as the primary evidence boundary.
+
+That design choice has two benefits:
+
+1. it keeps the workflow deterministic and easier to reproduce
+2. it makes the analysis boundary clearer by focusing on dependency-relevant artifacts
+
+The project also uses a curated dataset rather than unconstrained crawling so that selection decisions remain understandable and repeatable.
+
+---
+
+## Limitations and Non-Goals
+
+This repository studies **dependency-driven software supply chain exposure**.
+
+It does **not** attempt to measure:
+
+- model behavior risk
+- alignment or misuse risk
+- dataset quality or safety
+- general AI safety properties
+
+The current findings are constrained by:
+
+- dependency visibility in public repositories
+- version pinning quality
+- public vulnerability database coverage
+- scanner precision and normalization limits
+
+These limitations do not invalidate the atlas, but they do define the confidence boundary around the reported findings.
+
+---
+
+## Detailed Docs and Internal Specs
+
+More detailed execution contracts, handoff notes, and internal specifications live under `docs/`.
+
+Use the README as the primary entry point for:
+
+- what the project is
+- how to run it
+- what artifacts it produces
+- how to interpret the outputs
+
+Use `docs/` for lower-level implementation details and internal project documentation.
+
+---
+
+## Repository Link
+
+Project source code:
+
+- <https://github.com/Mojo4Sho1/CSE6392_Project_AI-Supply-Chain-Risk-Atlas>
+
+---
+
+## Suggested Entry Points
+
+If you are new to the repository, start here:
+
+1. `data/models.csv`
+2. `Makefile`
+3. `graphs/global.graphml`
+4. `reports/summary.json`
+5. `reports/summary.csv`
+
+If you want to demo or inspect the project interactively, run:
+
+```bash
+make dashboard
+```
 
 ---
 
 ## License
 
-TBD.
+Add the project license here once finalized.
